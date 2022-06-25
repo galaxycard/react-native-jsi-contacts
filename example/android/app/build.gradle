@@ -134,7 +134,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.example.reactnativeturbostarter"
+        applicationId "in.galaxycard.android.utils.example"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -323,5 +323,5 @@ def isNewArchitectureEnabled() {
 react {
     reactRoot = rootProject.file("../node_modules/react-native/")
     codegenDir = rootProject.file("../node_modules/react-native-codegen/")
-    codegenJavaPackageName = "com.example.reactnativeturbostarter"
+    codegenJavaPackageName = "in.galaxycard.android.utils.example"
 }

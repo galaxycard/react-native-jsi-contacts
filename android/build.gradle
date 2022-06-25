@@ -23,6 +23,8 @@ def safeExtGet(prop, fallback) {
 apply plugin: "com.facebook.react"
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
 android {
     compileSdkVersion safeExtGet('TurboStarter_compileSdkVersion', 31)
     defaultConfig {
@@ -86,12 +88,13 @@ repositories {
 
 dependencies {
     implementation project(':ReactAndroid')
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 }
 
 if (isNewArchitectureEnabled()) {
     react {
         libraryName = "reactnativeturbostarter"
-        codegenJavaPackageName = "com.reactnativeturbostarter"
+        codegenJavaPackageName = "in.galaxycard.android.utils"
         jsRootDir = file("../src/")
         reactRoot = rootProject.file("../node_modules/react-native/")
         codegenDir = rootProject.file("../node_modules/react-native-codegen/")

@@ -57,7 +57,7 @@ yarn android
 ### iOS
 
 1. Run `RCT_NEW_ARCH_ENABLED=1 pod install` in `example/ios` folder
-2. You can run `xed ios` to open to workspace, and on the left side-bar navigate to `Pods -> Development Pods -> react-native-turbo-starter -> ios -> TurboStarter.mm` and next to the `@implementation` XCode will offer to complete the missing protocol for you
+2. You can run `xed ios` to open to workspace, and on the left side-bar navigate to `Pods -> Development Pods -> react-native-turbo-galaxycard-utils -> ios -> TurboStarter.mm` and next to the `@implementation` XCode will offer to complete the missing protocol for you
 3. Alternatively, you can open `TurboStarter.mm` and implement the new function by yourself.
 4. We're done! You can find the generated code in this path: `example/ios/build/generated/ios/TurboStarter`
 
@@ -74,8 +74,8 @@ Now you can re-run the example project and watch as your code runs with JSI!
 
 Follow the steps above, but consider the following:
 
-1. Declare your C++ function here: `cpp/react-native-turbo-starter.h`
-2. Implement your C++ function here: `cpp/react-native-turbo-starter.cpp`
+1. Declare your C++ function here: `cpp/react-native-turbo-galaxycard-utils.h`
+2. Implement your C++ function here: `cpp/react-native-turbo-galaxycard-utils.cpp`
 
 #### iOS
 
@@ -117,12 +117,12 @@ Java_com_reactnativeturbostarter_TurboStarterModule_nativeMultiply(JNIEnv *env, 
 
 ## Steps taken to create this repository
 
-1. Create the repo using react-native-create-library (<https://github.com/talknagish/react-native-turbo-starter/commit/f755c6ec6aa653d46a92474592de552cb3ba3f6c>)
-2. Upgrade the library to react-native 0.68 (<https://github.com/talknagish/react-native-turbo-starter/pull/1>)
-3. Upgrade the example to react-native 0.68 and call 1 turbo module function (<https://github.com/talknagish/react-native-turbo-starter/pull/2>)
-4. Expend the Spec and call complex types (<https://github.com/talknagish/react-native-turbo-starter/pull/3>)
-5. Call native code (<https://github.com/talknagish/react-native-turbo-starter/pull/4>)
-6. Add the shared C++ library (<https://github.com/talknagish/react-native-turbo-starter/pull/5>)
+1. Create the repo using react-native-create-library (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/commit/f755c6ec6aa653d46a92474592de552cb3ba3f6c>)
+2. Upgrade the library to react-native 0.68 (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/pull/1>)
+3. Upgrade the example to react-native 0.68 and call 1 turbo module function (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/pull/2>)
+4. Expend the Spec and call complex types (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/pull/3>)
+5. Call native code (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/pull/4>)
+6. Add the shared C++ library (<https://github.com/talknagish/react-native-turbo-galaxycard-utils/pull/5>)
 
 ## Known Issues
 
@@ -151,8 +151,8 @@ const spyFunction = (msg) => {
 
 ## Clone and create your own library
 
-1. clone `react-native-turbo-starter`
-2. cd `react-native-turbo-starter`
+1. clone `react-native-turbo-galaxycard-utils`
+2. cd `react-native-turbo-galaxycard-utils`
 3. `rm -rf .git`
 4. rename all files containing `starter` word (script in the future)
 5. `git init`

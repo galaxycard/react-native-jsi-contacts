@@ -1,4 +1,4 @@
-package com.example.reactnativeturbostarter.newarchitecture.components;
+package in.galaxycard.android.utils.example.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;
