@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "react-native-turbo-galaxycard-utils.h"
+#include "react-native-turbo-utils.h"
 #include "log.h"
 
 /*

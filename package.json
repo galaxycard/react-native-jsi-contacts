@@ -1,5 +1,5 @@
 {
-  "name": "react-native-turbo-galaxycard-utils",
+  "name": "@galaxycard/react-native-turbo-utils",
   "version": "0.0.1",
   "description": "React 0.68+ Turbo Module example with codegen with typescript for Objective-C and Java/Kotlin with C++ shared library",
   "main": "lib/commonjs/index",
@@ -13,7 +13,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-turbo-galaxycard-utils.podspec",
+    "react-native-turbo-utils.podspec",
     "!lib/typescript/example",
     "!android/build",
     "!ios/build",
@@ -36,13 +36,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/galaxycard/react-native-turbo-galaxycard-utils",
+  "repository": "https://github.com/galaxycard/react-native-turbo-utils",
   "author": "Nagish <hello@talknagish.com> (https://talknagish.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/galaxycard/react-native-turbo-galaxycard-utils/issues"
+    "url": "https://github.com/galaxycard/react-native-turbo-utils/issues"
   },
-  "homepage": "https://github.com/galaxycard/react-native-turbo-galaxycard-utils#readme",
+  "homepage": "https://github.com/galaxycard/react-native-turbo-utils#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

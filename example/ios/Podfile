@@ -20,7 +20,7 @@ target 'TurboStarterExample' do
   )
 
   # pod linking won't initiate codegen so we can't use it for now
-  # pod 'react-native-turbo-galaxycard-utils', :path => '../..'
+  # pod 'react-native-turbo-utils', :path => '../..'
 
   # Enables Flipper.
   #
