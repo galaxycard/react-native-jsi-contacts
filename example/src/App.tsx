@@ -17,11 +17,10 @@ import {
   StyleSheet,
   Text,
   useColorScheme,
-  View
+  View,
 } from 'react-native';
-import NativeTurboStarter from 'react-native-turbo-galaxycard-utils';
+import NativeTurboStarter from 'react-native-turbo-utils';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-
 
 const Section: React.FC<{
   title: string;
@@ -87,10 +86,15 @@ const App = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}
         >
-          <Button title="get" onPress={() => {
-            const start = Date.now()
-            NativeTurboStarter.getContacts().then((r) => console.log(r, Date.now() - start))
-          }} />
+          <Button
+            title="get"
+            onPress={() => {
+              const start = Date.now();
+              NativeTurboStarter.getContacts().then((r) =>
+                console.log(r, Date.now() - start)
+              );
+            }}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>

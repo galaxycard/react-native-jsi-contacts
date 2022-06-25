@@ -1,4 +1,4 @@
-#import "react-native-turbo-galaxycard-utils.h"
+#import "react-native-turbo-utils.h"
 #import "TurboStarter.h"
 #import <TurboStarter/TurboStarter.h>
 #import <React/RCTLog.h>
