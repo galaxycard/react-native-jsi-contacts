@@ -1,4 +1,4 @@
-package com.example.reactnativeturbostarter.newarchitecture;
+package in.galaxycard.android.utils.example.newarchitecture;
 
 
 
@@ -21,9 +21,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.example.reactnativeturbostarter.BuildConfig;
-import com.example.reactnativeturbostarter.newarchitecture.components.MainComponentsRegistry;
-import com.example.reactnativeturbostarter.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import in.galaxycard.android.utils.example.BuildConfig;
+import in.galaxycard.android.utils.example.newarchitecture.components.MainComponentsRegistry;
+import in.galaxycard.android.utils.example.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

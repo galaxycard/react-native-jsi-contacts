@@ -300,7 +300,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativeturbostarter;
+				PRODUCT_BUNDLE_IDENTIFIER = in.galaxycard.android.utils.example;
 				PRODUCT_NAME = TurboStarterExample;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -322,7 +322,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.reactnativeturbostarter;
+				PRODUCT_BUNDLE_IDENTIFIER = in.galaxycard.android.utils.example;
 				PRODUCT_NAME = TurboStarterExample;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

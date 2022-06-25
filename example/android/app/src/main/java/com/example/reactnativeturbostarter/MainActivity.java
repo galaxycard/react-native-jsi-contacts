@@ -1,4 +1,4 @@
-package com.example.reactnativeturbostarter;
+package in.galaxycard.android.utils.example;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

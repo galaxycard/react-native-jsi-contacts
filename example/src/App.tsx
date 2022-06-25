@@ -10,17 +10,18 @@
 
 import React from 'react';
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
-  View,
+  View
 } from 'react-native';
-import NativeTurboStarter from 'react-native-turbo-starter';
-
+import NativeTurboStarter from 'react-native-turbo-galaxycard-utils';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+
 
 const Section: React.FC<{
   title: string;
@@ -59,12 +60,12 @@ const App = () => {
   const [promise3, setPromise3] = React.useState<string>('');
 
   React.useEffect(() => {
-    NativeTurboStarter.getGreeting('Yotam');
-    NativeTurboStarter.getTurboPromise(42).then((res) => setPromise1(res));
-    NativeTurboStarter.getTurboPromise(1).then((res) => setPromise2(res));
-    NativeTurboStarter.getTurboPromise(7).catch((error: Error) => {
-      setPromise3(error.message);
-    });
+    // NativeTurboStarter.getGreeting('Yotam');
+    // NativeTurboStarter.getContacts().then(console.log);
+    // NativeTurboStarter.getTurboPromise(1).then((res) => setPromise2(res));
+    // NativeTurboStarter.getTurboPromise(7).catch((error: Error) => {
+    //   setPromise3(error.message);
+    // });
   }, []);
 
   const backgroundStyle = {
@@ -86,36 +87,10 @@ const App = () => {
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}
         >
-          <Section title="getGreeting">
-            {NativeTurboStarter.getGreeting('Yotam')}
-          </Section>
-          <Section title="getTurboArray">
-            {NativeTurboStarter.getTurboArray(['Hello', 'World']).join(', ')}
-          </Section>
-          <Section title="getTurboObject">
-            {JSON.stringify(
-              NativeTurboStarter.getTurboObject({
-                title: 'Hello, world!',
-              })
-            )}
-          </Section>
-          <Section title="getTurboObjectGeneric">
-            {JSON.stringify(
-              NativeTurboStarter.getTurboObjectGeneric({
-                magicNumber: 7,
-              })
-            )}
-          </Section>
-          <Section title="getTurboPromise (resolve)">{`${promise1}`}</Section>
-          <Section title="getTurboPromise (resolve) 2">{`${promise2}`}</Section>
-          <Section title="getTurboPromise (reject)">{promise3}</Section>
-          <Section title="getBatteryLevel">
-            {NativeTurboStarter.getBatteryLevel()}
-          </Section>
-
-          <Section title="multiply (c++)">
-            {NativeTurboStarter.turboMultiply(3, 3)}
-          </Section>
+          <Button title="get" onPress={() => {
+            const start = Date.now()
+            NativeTurboStarter.getContacts().then((r) => console.log(r, Date.now() - start))
+          }} />
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,4 +1,4 @@
-package com.example.reactnativeturbostarter.newarchitecture.modules;
+package in.galaxycard.android.utils.example.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

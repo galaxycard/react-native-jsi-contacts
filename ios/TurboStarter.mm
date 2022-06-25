@@ -1,4 +1,4 @@
-#import "react-native-turbo-starter.h"
+#import "react-native-turbo-galaxycard-utils.h"
 #import "TurboStarter.h"
 #import <TurboStarter/TurboStarter.h>
 #import <React/RCTLog.h>
@@ -58,7 +58,7 @@
         resolve(@YES);
         return;
     } else if (magicNumber == 7) {
-        NSError *error = [NSError errorWithDomain:@"com.example.reactnativeturbostarter" code:3456 userInfo:@{NSLocalizedDescriptionKey:@"Invalid user name."}];
+        NSError *error = [NSError errorWithDomain:@"in.galaxycard.android.utils.example" code:3456 userInfo:@{NSLocalizedDescriptionKey:@"Invalid user name."}];
         reject(@"1", @"You stepped on a mine", error);
         return;
     }
