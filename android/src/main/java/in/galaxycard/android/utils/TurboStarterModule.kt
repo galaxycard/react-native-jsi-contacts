@@ -71,6 +71,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
         filter.addAction(AudioManager.ACTION_HEADSET_PLUG)
         filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+        filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             filter.addAction(TelephonyManager.ACTION_SUBSCRIPTION_CARRIER_IDENTITY_CHANGED)
         }

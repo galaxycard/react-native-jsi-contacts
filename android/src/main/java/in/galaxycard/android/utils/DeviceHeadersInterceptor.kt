@@ -67,6 +67,8 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         builder.addHeader("memory-total", deviceData["maxMemory"] as String)
         builder.addHeader("memory-used", deviceData["usedMemory"] as String)
         builder.addHeader("pin-or-fingerprint-set", deviceData["pinOrFingerprintSet"] as String)
+        val locationEnabled = if (deviceData["hasLocation"] as Boolean) "yes" else "no"
+        builder.addHeader("location-enabled", deviceData["locationEnabled"] as String)
 
         return chain.proceed(builder.build())
     }
