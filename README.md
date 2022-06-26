@@ -64,7 +64,7 @@ yarn android
 ### Android
 
 1. run `./gradlew generateCodegenArtifactsFromSchema` in example/android
-2. You can open Android Studio and access `android/src/main/java/com/reactnativeturbostarter/TurboStarterModule.kt` and let android studio complete the missing new function for you
+2. You can open Android Studio and access `android/src/main/java/com/reactnativeturboutils/TurboStarterModule.kt` and let android studio complete the missing new function for you
 3. Alternatively, you can open `TurboStarterModule.kt` and implement it by yourself
 4. We're done! You can find the generated code in this path: `android/build/generated/source/codegen`
 
@@ -109,7 +109,7 @@ override fun turboMultiply(num1: Double, num2: Double): Double {
 
 ```cpp
 extern "C" JNIEXPORT jdouble JNICALL
-Java_com_reactnativeturbostarter_TurboStarterModule_nativeMultiply(JNIEnv *env, jclass type, jdouble num1, jdouble num2)
+Java_com_reactnativeturboutils_TurboStarterModule_nativeMultiply(JNIEnv *env, jclass type, jdouble num1, jdouble num2)
 {
     return turbostarter::multiply(num1, num2);
 }

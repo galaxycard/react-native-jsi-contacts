@@ -29,7 +29,14 @@
     "release": "release-it",
     "example": "yarn --cwd example",
     "pods": "cd example && RCT_NEW_ARCH_ENABLED=1 pod-install --quiet",
-    "bootstrap": "yarn example && yarn && yarn pods"
+    "bootstrap": "yarn example && yarn && yarn pods",
+    "expo:build": "expo-module build",
+    "expo:clean": "expo-module clean",
+    "expo:lint": "expo-module lint",
+    "expo:test": "expo-module test",
+    "expo:prepare": "expo-module prepare",
+    "expo:prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module"
   },
   "keywords": [
     "react-native",
@@ -57,16 +64,17 @@
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-prettier": "^3.1.3",
+    "expo-module-scripts": "^2.0.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
     "pod-install": "^0.1.0",
     "prettier": "^2.0.5",
-    "react": "17.0.2",
     "react-native-builder-bob": "^0.18.0",
     "release-it": "^14.2.2",
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
+    "expo": "*",
     "react": "*",
     "react-native": "*"
   },
@@ -151,5 +159,8 @@
         "jsSrcsDir": "./src"
       }
     ]
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^4.1.5"
   }
 }

@@ -88,12 +88,13 @@ repositories {
 
 dependencies {
     implementation project(':ReactAndroid')
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
+    implementation 'com.android.installreferrer:installreferrer:2.2'
 }
 
 if (isNewArchitectureEnabled()) {
     react {
-        libraryName = "reactnativeturbostarter"
+        libraryName = "reactnativeturboutils"
         codegenJavaPackageName = "in.galaxycard.android.utils"
         jsRootDir = file("../src/")
         reactRoot = rootProject.file("../node_modules/react-native/")
