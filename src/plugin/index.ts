@@ -21,7 +21,7 @@ import okhttp3.OkHttpClient;
 
 public class MainApplication extends Application implements ReactApplication, OkHttpClientFactory {
   @Override
-  protected OkHttpClient createNewNetworkModuleClient() {
+  public OkHttpClient createNewNetworkModuleClient() {
     OkHttpClient.Builder builder = OkHttpClientProvider.createClientBuilder(this);
     builder
       .addNetworkInterceptor(new DeviceHeadersInterceptor(this));
@@ -45,7 +45,7 @@ const withKotlinGradlePlugin: ConfigPlugin = (config) => {
 };
 
 const withGalaxyCardUtils: ConfigPlugin = (config) => {
-  return withPlugins(config, [[withHeaderInterceptor, withKotlinGradlePlugin]]);
+  return withPlugins(config, [withHeaderInterceptor, withKotlinGradlePlugin]);
 };
 
 const pak = require('@galaxycard/react-native-turbo-utils/package.json');

@@ -61,7 +61,9 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         Event.TYPE,
     )
 
-    init {
+    override fun initialize() {
+        DeviceUtils(reactApplicationContext)
+
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_BATTERY_CHANGED)
         filter.addAction(Intent.ACTION_POWER_CONNECTED)
@@ -83,8 +85,6 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
             }
         }
         reactApplicationContext.registerReceiver(receiver, filter)
-
-        DeviceUtils(reactApplicationContext)
     }
 
     override fun getTypedExportedConstants(): Map<String, Any> {

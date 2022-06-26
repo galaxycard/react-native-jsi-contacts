@@ -1,2 +1,2 @@
 import { TurboModuleRegistry } from 'react-native';
-export default TurboModuleRegistry.getEnforcing('TurboStarter');
+export default TurboModuleRegistry.getEnforcing('GalaxyCard');
