@@ -1,4 +1,9 @@
-import { ConfigPlugin, withMainApplication } from '@expo/config-plugins';
+import {
+  ConfigPlugin,
+  withMainApplication,
+  withPlugins,
+  withProjectBuildGradle,
+} from '@expo/config-plugins';
 
 const withHeaderInterceptor: ConfigPlugin = (config) => {
   return withMainApplication(config, async (config) => {
@@ -27,4 +32,21 @@ public class MainApplication extends Application implements ReactApplication, Ok
   });
 };
 
-export default withHeaderInterceptor;
+const withKotlinGradlePlugin: ConfigPlugin = (config) => {
+  return withProjectBuildGradle(config, async (config) => {
+    config.modResults.contents = config.modResults.contents.replace(
+      "classpath('de.undercouch:gradle-download-task:4.1.2')",
+      "classpath('de.undercouch:gradle-download-task:4.1.2')\n" +
+        'classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"'
+    );
+    return config;
+  });
+};
+
+export default withPlugins(
+  {
+    name: 'galaxycard-utils',
+    slug: 'galaxycard-utils',
+  },
+  [withHeaderInterceptor, withKotlinGradlePlugin]
+);
