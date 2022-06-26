@@ -2,7 +2,7 @@ import { TurboModule, TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   getContacts(): Promise<object>;
-  getConstants(): () => {
+  getConstants(): {
     uniqueId: string;
     deviceId: string;
     bundleId: string;
@@ -14,7 +14,7 @@ export interface Spec extends TurboModule {
     model: string;
     installReferrer: string;
   };
-  getDeviceData(): () => {
+  getDeviceData(): {
     hasHeadphones: boolean;
     carrier: string;
     airplaneMode: boolean;

@@ -2,6 +2,7 @@ package `in`.galaxycard.android.utils
 
 import android.content.*
 import android.database.Cursor
+import android.location.LocationManager
 import android.media.AudioManager
 import android.os.*
 import android.provider.ContactsContract
@@ -10,14 +11,11 @@ import android.provider.Settings.Secure.getString
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
-import com.android.installreferrer.api.InstallReferrerClient
-import com.android.installreferrer.api.InstallReferrerStateListener
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
-
 class TurboStarterModule(reactContext: ReactApplicationContext?) :
-    NativeTurboStarterSpec(reactContext), LifecycleEventListener {
+    NativeTurboStarterSpec(reactContext) {
 
     val ID_FOR_PROFILE_CONTACT = -1
 
@@ -89,7 +87,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         DeviceUtils(reactApplicationContext)
     }
 
-    override fun getConstants(): Map<String, Any> {
+    override fun getTypedExportedConstants(): Map<String, Any> {
         return DeviceUtils(reactApplicationContext).constants()
     }
 

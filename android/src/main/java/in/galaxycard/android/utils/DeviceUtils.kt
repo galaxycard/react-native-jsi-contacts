@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
+import android.location.LocationManager
 import android.media.AudioManager
 import android.os.*
 import androidx.core.content.pm.PackageInfoCompat
@@ -16,7 +17,6 @@ import android.telephony.TelephonyManager
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import java.math.BigInteger
-import com.sun.scenario.Settings
 
 class DeviceUtils(private val context: Context) {
     companion object {
@@ -51,7 +51,7 @@ class DeviceUtils(private val context: Context) {
         }
     }
 
-    fun constants(): MutableMap<String, String> {
+    fun constants(): MutableMap<String, Any> {
         var appVersion: String
         var buildNumber: String
         var appName: String
@@ -67,7 +67,7 @@ class DeviceUtils(private val context: Context) {
             buildNumber = Build.UNKNOWN
             appName = Build.UNKNOWN
         }
-        val constants: MutableMap<String, String> = HashMap()
+        val constants: MutableMap<String, Any> = HashMap()
         constants["uniqueId"] =
             getString(context.contentResolver, Settings.Secure.ANDROID_ID)
         constants["deviceId"] = Build.BOARD
@@ -200,7 +200,7 @@ class DeviceUtils(private val context: Context) {
         }
         val powerManager =
             context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        var powerSaveMode = powerManager.isPowerSaveMode
+        val powerSaveMode = powerManager.isPowerSaveMode
         val powerState = HashMap<String, Any>()
         powerState[BATTERY_STATE] = batteryState
         powerState[BATTERY_LEVEL] = batteryPercentage.toDouble()

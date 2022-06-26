@@ -44,12 +44,12 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
             builder.addHeader("x-gct-signature", mSignatureHash!!)
         }
         val constants = DeviceUtils(context).constants()
-        builder.addHeader("device", constants["deviceId"]!!)
-        builder.addHeader("build", constants["buildNumber"]!!)
-        builder.addHeader("os-version", constants["systemVersion"]!!)
-        builder.addHeader("brand", constants["brand"]!!)
-        builder.addHeader("model", constants["model"]!!)
-        builder.addHeader("install-referrer", constants["installReferrer"]!!)
+        builder.addHeader("device", constants["deviceId"]!! as String)
+        builder.addHeader("build", constants["buildNumber"]!! as String)
+        builder.addHeader("os-version", constants["systemVersion"]!! as String)
+        builder.addHeader("brand", constants["brand"]!! as String)
+        builder.addHeader("model", constants["model"]!! as String)
+        builder.addHeader("install-referrer", constants["installReferrer"]!! as String)
 
         val deviceData = DeviceUtils(context).dynamicValues()
         builder.addHeader("carrier", deviceData["carrier"] as String)
