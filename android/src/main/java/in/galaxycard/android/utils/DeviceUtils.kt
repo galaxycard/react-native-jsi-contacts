@@ -16,6 +16,7 @@ import android.telephony.TelephonyManager
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import java.math.BigInteger
+import com.sun.scenario.Settings
 
 class DeviceUtils(private val context: Context) {
     companion object {
@@ -158,6 +159,16 @@ class DeviceUtils(private val context: Context) {
             val memInfo = memInfos[0]
             deviceData["usedMemory"] = memInfo.totalPss * 1024.0
         }
+
+        var hasLocation = false
+        val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        hasLocation =
+            hasLocation or locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        hasLocation =
+            hasLocation or locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        deviceData["hasLocation"] = hasLocation
 
         return deviceData
     }
