@@ -1,5 +1,6 @@
 import {
   ConfigPlugin,
+  createRunOncePlugin,
   withMainApplication,
   withPlugins,
   withProjectBuildGradle,
@@ -43,10 +44,9 @@ const withKotlinGradlePlugin: ConfigPlugin = (config) => {
   });
 };
 
-export default withPlugins(
-  {
-    name: 'galaxycard-utils',
-    slug: 'galaxycard-utils',
-  },
-  [withHeaderInterceptor, withKotlinGradlePlugin]
-);
+const withGalaxyCardUtils: ConfigPlugin = (config) => {
+  return withPlugins(config, [[withHeaderInterceptor, withKotlinGradlePlugin]]);
+};
+
+const pak = require('../../package.json');
+export default createRunOncePlugin(withGalaxyCardUtils, pak.name, pak.version);
