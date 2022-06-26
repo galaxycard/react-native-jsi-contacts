@@ -27,6 +27,7 @@ export interface Spec extends TurboModule {
     totalDiskCapacity: number;
     maxMemory: number;
     usedMemory: number;
+    hasLocation: boolean;
   };
 }
 
