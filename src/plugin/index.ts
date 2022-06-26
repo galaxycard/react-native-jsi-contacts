@@ -48,5 +48,5 @@ const withGalaxyCardUtils: ConfigPlugin = (config) => {
   return withPlugins(config, [[withHeaderInterceptor, withKotlinGradlePlugin]]);
 };
 
-const pak = require('../package.json');
+const pak = require('@galaxycard/react-native-turbo-utils/package.json');
 export default createRunOncePlugin(withGalaxyCardUtils, pak.name, pak.version);
