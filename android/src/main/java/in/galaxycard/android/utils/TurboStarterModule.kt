@@ -1,18 +1,23 @@
 package `in`.galaxycard.android.utils
 
+import android.content.*
 import android.database.Cursor
+import android.media.AudioManager
+import android.os.*
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.*
+import android.provider.Settings.Secure.getString
+import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
 import com.facebook.react.bridge.*
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 
 class TurboStarterModule(reactContext: ReactApplicationContext?) :
-    NativeTurboStarterSpec(reactContext) {
+    NativeTurboStarterSpec(reactContext), LifecycleEventListener {
 
     val ID_FOR_PROFILE_CONTACT = -1
 
@@ -58,8 +63,41 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         Event.TYPE,
     )
 
+    init {
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED)
+        filter.addAction(Intent.ACTION_POWER_CONNECTED)
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+        filter.addAction(AudioManager.ACTION_HEADSET_PLUG)
+        filter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            filter.addAction(TelephonyManager.ACTION_SUBSCRIPTION_CARRIER_IDENTITY_CHANGED)
+        }
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                sendEvent(
+                    reactApplicationContext,
+                    "RNDeviceInfo_deviceDataChanged",
+                    null
+                )
+            }
+        }
+        reactApplicationContext.registerReceiver(receiver, filter)
+
+        DeviceUtils(reactApplicationContext)
+    }
+
+    override fun getConstants(): Map<String, Any> {
+        return DeviceUtils(reactApplicationContext).constants()
+    }
+
+    override fun getDeviceData(): WritableNativeMap {
+        return Arguments.makeNativeMap(DeviceUtils(reactApplicationContext).dynamicValues())
+    }
+
     override fun getContacts(promise: Promise) {
-        val cursor = getReactApplicationContextIfActiveOrWarn()?.contentResolver?.query(
+        val cursor = reactApplicationContext.contentResolver.query(
             ContactsContract.Data.CONTENT_URI,
             FULL_PROJECTION,
             ContactsContract.Data.MIMETYPE + "=? OR "
@@ -361,22 +399,15 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         return "other"
     }
 
-//    override fun getTurboPromise(promise: Promise) {
-//        GlobalScope.launch {
-//            val contactsListAsync = async { getContacts() }
-//            val contacts = contactsListAsync.await()
-//            promise.resolve(contacts.size)
-//        }
-//    }
-
-//    override fun getBatteryLevel(): Double {
-//        return batteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)?.toDouble()
-//            ?: .0
-//    }
-//
-//    override fun turboMultiply(num1: Double, num2: Double): Double {
-//        return nativeMultiply(num1, num2)
-//    }
+    private fun sendEvent(
+        reactContext: ReactContext,
+        eventName: String,
+        data: Any?
+    ) {
+        reactContext
+            .getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit(eventName, data)
+    }
 
     override fun getName(): String {
         return NAME
@@ -385,10 +416,10 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
 //    private external fun nativeMultiply(num1: Double, num2: Double): Double
 
     companion object {
-        const val NAME = "TurboStarter"
+        const val NAME = "GalaxyCard"
 
         init {
-            System.loadLibrary("reactnativeturbostarter-jni")
+            System.loadLibrary("reactnativeturboutils-jni")
         }
     }
 }

@@ -1,7 +1,7 @@
 #include <android/log.h>
 #include <stdio.h>
 
-#define APP_LOG_TAG "reactnativeturbostarter-jni"
+#define APP_LOG_TAG "reactnativeturboutils-jni"
 
 #define _APP_LOG(level, tag, ...)                             \
     do                                                        \
