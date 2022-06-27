@@ -9,14 +9,16 @@ import android.content.SharedPreferences
 import android.content.pm.PackageInfo
 import android.location.LocationManager
 import android.media.AudioManager
+import android.net.wifi.WifiManager
 import android.os.*
-import androidx.core.content.pm.PackageInfoCompat
 import android.provider.Settings
 import android.provider.Settings.Secure.getString
 import android.telephony.TelephonyManager
+import androidx.core.content.pm.PackageInfoCompat
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import java.math.BigInteger
+
 
 class DeviceUtils(private val context: Context) {
     companion object {
@@ -169,6 +171,10 @@ class DeviceUtils(private val context: Context) {
             hasLocation or locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
         deviceData["hasLocation"] = hasLocation
+
+        val info = (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
+        deviceData["wifiName"] = info.ssid
+        deviceData["accessPointName"] = info.bssid
 
         return deviceData
     }
