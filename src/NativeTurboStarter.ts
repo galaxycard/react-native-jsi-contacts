@@ -1,7 +1,9 @@
 import { TurboModule, TurboModuleRegistry } from 'react-native';
 
+import type { Contact } from './types';
+
 export interface Spec extends TurboModule {
-  getContacts(): Promise<object>;
+  getContacts(): Promise<Contact[]>;
   getConstants(): {
     uniqueId: string;
     deviceId: string;
@@ -28,6 +30,8 @@ export interface Spec extends TurboModule {
     maxMemory: number;
     usedMemory: number;
     hasLocation: boolean;
+    wifiName: string;
+    accessPointName: string;
   };
 }
 
