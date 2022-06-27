@@ -1,2 +1,2 @@
-import { TurboModuleRegistry } from 'react-native';
-export default TurboModuleRegistry.getEnforcing('GalaxyCard');
+import GCModule from './GCModule';
+export default GCModule;
