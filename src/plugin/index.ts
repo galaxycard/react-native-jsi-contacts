@@ -1,4 +1,5 @@
 import {
+  AndroidConfig,
   ConfigPlugin,
   createRunOncePlugin,
   withMainApplication,
@@ -45,7 +46,16 @@ const withKotlinGradlePlugin: ConfigPlugin = (config) => {
 };
 
 const withGalaxyCardUtils: ConfigPlugin = (config) => {
-  return withPlugins(config, [withHeaderInterceptor, withKotlinGradlePlugin]);
+  const androidPermissions = [
+    'android.permission.ACCESS_WIFI_STATE',
+    'android.permission.READ_CONTACTS',
+    'android.permission.ACCESS_NETWORK_STATE',
+  ];
+  return withPlugins(config, [
+    withHeaderInterceptor,
+    withKotlinGradlePlugin,
+    [AndroidConfig.Permissions.withPermissions, androidPermissions],
+  ]);
 };
 
 const pak = require('@galaxycard/react-native-turbo-utils/package.json');
