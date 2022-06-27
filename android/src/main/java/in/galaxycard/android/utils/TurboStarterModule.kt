@@ -4,6 +4,7 @@ import android.content.*
 import android.database.Cursor
 import android.location.LocationManager
 import android.media.AudioManager
+import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.*
 import android.provider.ContactsContract
@@ -11,58 +12,14 @@ import android.provider.ContactsContract.CommonDataKinds.*
 import android.provider.Settings.Secure.getString
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
-import android.text.TextUtils
-import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
-class TurboStarterModule(reactContext: ReactApplicationContext?) :
-    NativeTurboStarterSpec(reactContext) {
 
-    val ID_FOR_PROFILE_CONTACT = -1
-
-    private val FULL_PROJECTION = arrayOf(
-        ContactsContract.Data._ID,
-        ContactsContract.Data.CONTACT_ID,
-        ContactsContract.Data.RAW_CONTACT_ID,
-        ContactsContract.Data.LOOKUP_KEY,
-        ContactsContract.Contacts.Data.MIMETYPE,
-        ContactsContract.Profile.DISPLAY_NAME,
-        ContactsContract.Data.PHOTO_URI,
-        StructuredName.DISPLAY_NAME,
-        StructuredName.GIVEN_NAME,
-        StructuredName.MIDDLE_NAME,
-        StructuredName.FAMILY_NAME,
-        StructuredName.PREFIX,
-        StructuredName.SUFFIX,
-        Phone.NUMBER,
-        Phone.NORMALIZED_NUMBER,
-        Phone.TYPE,
-        Phone.LABEL,
-        Email.DATA,
-        Email.ADDRESS,
-        Email.TYPE,
-        Email.LABEL,
-        Organization.COMPANY,
-        Organization.TITLE,
-        Organization.DEPARTMENT,
-        StructuredPostal.FORMATTED_ADDRESS,
-        StructuredPostal.TYPE,
-        StructuredPostal.LABEL,
-        StructuredPostal.STREET,
-        StructuredPostal.POBOX,
-        StructuredPostal.NEIGHBORHOOD,
-        StructuredPostal.CITY,
-        StructuredPostal.REGION,
-        StructuredPostal.POSTCODE,
-        StructuredPostal.COUNTRY,
-        Note.NOTE,
-        Website.URL,
-        Im.DATA,
-        Event.START_DATE,
-        Event.TYPE,
-    )
-
+class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboStarterSpec(reactContext) {
     override fun initialize() {
         DeviceUtils(reactApplicationContext)
 
@@ -102,307 +59,114 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         return Arguments.makeNativeMap(DeviceUtils(reactApplicationContext).dynamicValues())
     }
 
-    override fun getContacts(promise: Promise) {
-        val cursor = reactApplicationContext.contentResolver.query(
-            ContactsContract.Data.CONTENT_URI,
-            FULL_PROJECTION,
-            ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=? OR "
-                    + ContactsContract.Data.MIMETYPE + "=?",
-            arrayOf(
-                Email.CONTENT_ITEM_TYPE,
-                Phone.CONTENT_ITEM_TYPE,
-                StructuredName.CONTENT_ITEM_TYPE,
-                Organization.CONTENT_ITEM_TYPE,
-                StructuredPostal.CONTENT_ITEM_TYPE,
-                Note.CONTENT_ITEM_TYPE,
-                Website.CONTENT_ITEM_TYPE,
-                Im.CONTENT_ITEM_TYPE,
-                Event.CONTENT_ITEM_TYPE,
-            ),
+    private fun getPhoneContacts(): ArrayList<Contact> {
+        val contactsList = ArrayList<Contact>()
+        val contactsCursor = reactApplicationContext.contentResolver?.query(
+            ContactsContract.Contacts.CONTENT_URI,
+            null,
+            null,
+            null,
+            Phone.DISPLAY_NAME + " ASC")
+        if (contactsCursor != null && contactsCursor.count > 0) {
+            val idIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts._ID)
+            val nameIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+            while (contactsCursor.moveToNext()) {
+                val id = contactsCursor.getString(idIndex)
+                val name = contactsCursor.getString(nameIndex)
+                contactsList.add(Contact(id, name))
+            }
+            contactsCursor.close()
+        }
+        return contactsList
+    }
+
+    private fun getContactNumbers(): HashMap<String, ArrayList<String>> {
+        val contactsNumberMap = HashMap<String, ArrayList<String>>()
+        val cursor: Cursor? = reactApplicationContext.contentResolver.query(
+            Phone.CONTENT_URI,
+            null,
+            null,
+            null,
             null
         )
-        val map: HashMap<String, HashMap<String, Any?>> = HashMap()
-
-        while (cursor != null && cursor.moveToNext()) {
-            val columnIndexContactId: Int = cursor.getColumnIndex(ContactsContract.Data.CONTACT_ID)
-            val columnIndexId: Int = cursor.getColumnIndex(ContactsContract.Data._ID)
-            val columnIndexRawContactId: Int =
-                cursor.getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID)
-            var contactId: String
-            var id: String?
-            var rawContactId: String
-            if (columnIndexContactId != -1) {
-                contactId = cursor.getString(columnIndexContactId)
-            } else {
-                //todo - double check this, it may not be necessary any more
-                contactId =
-                    java.lang.String.valueOf(ID_FOR_PROFILE_CONTACT) //no contact id for 'ME' user
-            }
-            if (columnIndexId != -1) {
-                id = cursor.getString(columnIndexId)
-            } else {
-                //todo - double check this, it may not be necessary any more
-                id = java.lang.String.valueOf(ID_FOR_PROFILE_CONTACT) //no contact id for 'ME' user
-            }
-            if (columnIndexRawContactId != -1) {
-                rawContactId = cursor.getString(columnIndexRawContactId)
-            } else {
-                //todo - double check this, it may not be necessary any more
-                rawContactId =
-                    java.lang.String.valueOf(ID_FOR_PROFILE_CONTACT) //no contact id for 'ME' user
-            }
-            if (!map.containsKey(contactId)) {
-                val contact = object : HashMap<String, Any?>() {
-                    init {
-                        put("contactId", contactId)
-                        put("phones", ArrayList<Map<String, String>>())
-                        put("emails", ArrayList<Map<String, String>>())
-                        put("postalAddresses", ArrayList<Map<String, String>>())
-                        put("instantMessengers", ArrayList<Map<String, String>>())
-                    }
-                }
-                map[contactId] = contact
-            }
-            val contact: HashMap<String, Any?>? = map[contactId]
-            val mimeType: String =
-                cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE))
-            val name: String =
-                cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
-            contact?.put("rawContactId", rawContactId)
-            if (!TextUtils.isEmpty(name) && TextUtils.isEmpty(contact?.get("displayName") as String?)) {
-                contact?.put("displayName", name)
-            }
-            if (TextUtils.isEmpty(contact?.get("photoUri") as String?)) {
-                if (cursor.getColumnIndex(ContactsContract.Data.PHOTO_URI) != -1) {
-                    val rawPhotoURI: String =
-                        cursor.getString(cursor.getColumnIndex(ContactsContract.Data.PHOTO_URI))
-                    if (!TextUtils.isEmpty(rawPhotoURI)) {
-                        contact?.put("photoUri", rawPhotoURI)
-                        contact?.put("hasPhoto", true)
-                    }
+        if (cursor != null && cursor.count > 0) {
+            val contactIdIndex = cursor.getColumnIndex(Phone.CONTACT_ID)
+            val numberIndex = cursor.getColumnIndex(Phone.NUMBER)
+            while (cursor.moveToNext()) {
+                val contactId = cursor.getString(contactIdIndex)
+                val number: String = cursor.getString(numberIndex)
+                //check if the map contains key or not, if not then create a new array list with number
+                if (contactsNumberMap.containsKey(contactId)) {
+                    contactsNumberMap[contactId]?.add(number)
+                } else {
+                    contactsNumberMap[contactId] = arrayListOf(number)
                 }
             }
-            when (mimeType) {
-                StructuredName.CONTENT_ITEM_TYPE -> {
-                    contact?.put("givenName", cursor.getString(cursor.getColumnIndex(StructuredName.GIVEN_NAME)))
-                    if (cursor.getString(cursor.getColumnIndex(StructuredName.MIDDLE_NAME)) != null) {
-                        contact?.put("middleName", cursor.getString(cursor.getColumnIndex(StructuredName.MIDDLE_NAME)))
-                    } else {
-                        contact?.put("middleName", "")
-                    }
-                    if (cursor.getString(cursor.getColumnIndex(StructuredName.FAMILY_NAME)) != null) {
-                        contact?.put("familyName", cursor.getString(cursor.getColumnIndex(StructuredName.FAMILY_NAME)))
-                    } else {
-                        contact?.put("familyName", "")
-                    }
-                    contact?.put("prefix", cursor.getString(cursor.getColumnIndex(StructuredName.PREFIX)))
-                    contact?.put("suffix", cursor.getString(cursor.getColumnIndex(StructuredName.SUFFIX)))
-                }
-
-                Phone.CONTENT_ITEM_TYPE -> {
-                    val phoneNumber: String = cursor.getString(cursor.getColumnIndex(Phone.NUMBER))
-                    val phoneType: Int = cursor.getInt(cursor.getColumnIndex(Phone.TYPE))
-                    if (!TextUtils.isEmpty(phoneNumber)) {
-                        var label = when (phoneType) {
-                            Phone.TYPE_HOME -> "home"
-                            Phone.TYPE_WORK -> "work"
-                            Phone.TYPE_MOBILE -> "mobile"
-                            Phone.TYPE_OTHER -> "other"
-                            else -> "other"
-                        }
-                        (contact?.get("phones") as ArrayList<HashMap<String, String>>).add(object : HashMap<String, String>() {
-                            init {
-                                put(label, phoneNumber)
-                            }
-                        })
-                    }
-                }
-                Email.CONTENT_ITEM_TYPE -> {
-                    val email: String = cursor.getString(cursor.getColumnIndex(Email.ADDRESS))
-                    val emailType: Int = cursor.getInt(cursor.getColumnIndex(Email.TYPE))
-                    if (!TextUtils.isEmpty(email)) {
-                        var label = when (emailType) {
-                            Email.TYPE_HOME -> "home"
-                            Email.TYPE_WORK -> "work"
-                            Email.TYPE_MOBILE -> "mobile"
-                            Email.TYPE_OTHER -> "other"
-                            Email.TYPE_CUSTOM -> if (cursor.getString(cursor.getColumnIndex(Email.LABEL)) != null) {
-                                cursor.getString(cursor.getColumnIndex(Email.LABEL)).toLowerCase()
-                            } else {
-                                ""
-                            }
-                            else -> "other"
-                        }
-                        (contact?.get("emails") as ArrayList<HashMap<String, String>>).add(object : HashMap<String, String>() {
-                            init {
-                                put(label, email)
-                            }
-                        })
-                    }
-                }
-                Website.CONTENT_ITEM_TYPE -> {
-                    val url: String = cursor.getString(cursor.getColumnIndex(Website.URL))
-                    val websiteType: Int = cursor.getInt(cursor.getColumnIndex(Website.TYPE))
-                    if (!TextUtils.isEmpty(url)) {
-                        var label = when (websiteType) {
-                            Website.TYPE_HOMEPAGE -> "homepage"
-                            Website.TYPE_BLOG -> "blog"
-                            Website.TYPE_PROFILE -> "profile"
-                            Website.TYPE_HOME -> "home"
-                            Website.TYPE_WORK -> "work"
-                            Website.TYPE_FTP -> "ftp"
-                            Website.TYPE_CUSTOM -> if (cursor.getString(
-                                    cursor.getColumnIndex(
-                                        Website.LABEL
-                                    )
-                                ) != null
-                            ) {
-                                cursor.getString(cursor.getColumnIndex(Website.LABEL)).toLowerCase()
-                            } else {
-                                ""
-                            }
-                            else -> "other"
-                        }
-                        (contact?.get("urls") as ArrayList<HashMap<String, String>>).add(object : HashMap<String, String>() {
-                            init {
-                                put(label, url)
-                            }
-                        })
-                    }
-                }
-                Im.CONTENT_ITEM_TYPE -> {
-                    val username: String = cursor.getString(cursor.getColumnIndex(Im.DATA))
-                    val imType: Int = cursor.getInt(cursor.getColumnIndex(Im.PROTOCOL))
-                    if (!TextUtils.isEmpty(username)) {
-                        var label = when (imType) {
-                            Im.PROTOCOL_AIM -> "AIM"
-                            Im.PROTOCOL_MSN -> "MSN"
-                            Im.PROTOCOL_YAHOO -> "Yahoo"
-                            Im.PROTOCOL_SKYPE -> "Skype"
-                            Im.PROTOCOL_QQ -> "QQ"
-                            Im.PROTOCOL_GOOGLE_TALK -> "Google Talk"
-                            Im.PROTOCOL_ICQ -> "ICQ"
-                            Im.PROTOCOL_JABBER -> "Jabber"
-                            Im.PROTOCOL_NETMEETING -> "NetMeeting"
-                            Im.PROTOCOL_CUSTOM -> if (cursor.getString(cursor.getColumnIndex(Im.CUSTOM_PROTOCOL)) != null) {
-                                cursor.getString(cursor.getColumnIndex(Im.CUSTOM_PROTOCOL))
-                            } else {
-                                ""
-                            }
-                            else -> "other"
-                        }
-                        (contact?.get("instantMessengers") as ArrayList<HashMap<String, String>>).add(object : HashMap<String, String>() {
-                            init {
-                                put(label, username)
-                            }
-                        })
-                    }
-                }
-                Organization.CONTENT_ITEM_TYPE -> {
-                    contact?.put("company", cursor.getString(cursor.getColumnIndex(Organization.COMPANY)))
-                    contact?.put("jobTitle", cursor.getString(cursor.getColumnIndex(Organization.TITLE)))
-                    contact?.put("department", cursor.getString(cursor.getColumnIndex(Organization.DEPARTMENT)))
-                }
-                StructuredPostal.CONTENT_ITEM_TYPE -> (contact?.get("postalAddresses") as ArrayList<HashMap<String, String>>).add(
-                    postalAddressFromCursor(
-                        cursor
-                    )
-                )
-                Event.CONTENT_ITEM_TYPE -> {
-                    val eventType: Int = cursor.getInt(cursor.getColumnIndex(Event.TYPE))
-                    if (eventType == Event.TYPE_BIRTHDAY) {
-                        try {
-                            val birthday: String =
-                                cursor.getString(cursor.getColumnIndex(Event.START_DATE))
-                                    .replace("--", "")
-                            val yearMonthDay = birthday.split("-").toTypedArray()
-                            val yearMonthDayList: List<String> = yearMonthDay.asList()
-                            if (yearMonthDayList.size == 2) {
-                                // birthday is formatted "12-31"
-                                val month = yearMonthDayList[0].toInt()
-                                val day = yearMonthDayList[1].toInt()
-                                if (month in 1..12 && day >= 1 && day <= 31) {
-                                    contact?.put("birthday", object : HashMap<String, Int>() {
-                                        init {
-                                            put("month", month)
-                                            put("day", day)
-                                        }
-                                    })
-                                }
-                            } else if (yearMonthDayList.size == 3) {
-                                // birthday is formatted "1986-12-31"
-                                val year = yearMonthDayList[0].toInt()
-                                val month = yearMonthDayList[1].toInt()
-                                val day = yearMonthDayList[2].toInt()
-                                if (year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
-                                    contact?.put("birthday", object : HashMap<String, Int>() {
-                                        init {
-                                            put("year", year)
-                                            put("month", month)
-                                            put("day", day)
-                                        }
-                                    })
-                                }
-                            }
-                        } catch (e: NumberFormatException) {
-                            // whoops, birthday isn't in the format we expect
-                            Log.w("ContactsProvider", e.toString())
-                        } catch (e: ArrayIndexOutOfBoundsException) {
-                            Log.w("ContactsProvider", e.toString())
-                        } catch (e: NullPointerException) {
-                            Log.w("ContactsProvider", e.toString())
-                        }
-                    }
-                }
-                Note.CONTENT_ITEM_TYPE -> contact?.put("note", cursor.getString(cursor.getColumnIndex(Note.NOTE)))
-            }
+            //contact contains all the number of a particular contact
+            cursor.close()
         }
-
-        promise.resolve(Arguments.makeNativeArray(map.values.toList()))
+        return contactsNumberMap
     }
 
-    private fun postalAddressFromCursor(cursor: Cursor): HashMap<String, String> {
-        val map = HashMap<String, String>()
-        map["label"] = getLabel(cursor)
-        putString(map, cursor, "formattedAddress", StructuredPostal.FORMATTED_ADDRESS)
-        putString(map, cursor, "street", StructuredPostal.STREET)
-        putString(map, cursor, "pobox", StructuredPostal.POBOX)
-        putString(map, cursor, "neighborhood", StructuredPostal.NEIGHBORHOOD)
-        putString(map, cursor, "city", StructuredPostal.CITY)
-        putString(map, cursor, "region", StructuredPostal.REGION)
-        putString(map, cursor, "state", StructuredPostal.REGION)
-        putString(map, cursor, "postCode", StructuredPostal.POSTCODE)
-        putString(map, cursor, "country", StructuredPostal.COUNTRY)
-        return map
-    }
-
-    private fun putString(
-        map: HashMap<String, String>,
-        cursor: Cursor,
-        key: String,
-        androidKey: String
-    ) {
-        val value = cursor.getString(cursor.getColumnIndex(androidKey))
-        if (!TextUtils.isEmpty(value)) map[key] = value
-    }
-
-    private fun getLabel(cursor: Cursor): String {
-        when (cursor.getInt(cursor.getColumnIndex(StructuredPostal.TYPE))) {
-            StructuredPostal.TYPE_HOME -> return "home"
-            StructuredPostal.TYPE_WORK -> return "work"
-            StructuredPostal.TYPE_CUSTOM -> {
-                val label = cursor.getString(cursor.getColumnIndex(StructuredPostal.LABEL))
-                return label ?: ""
+    private fun getContactEmails(): HashMap<String, ArrayList<String>> {
+        val contactsEmailMap = HashMap<String, ArrayList<String>>()
+        val cursor: Cursor? = reactApplicationContext.contentResolver.query(
+            Email.CONTENT_URI,
+            null,
+            null,
+            null,
+            null
+        )
+        if (cursor != null && cursor.count > 0) {
+            val contactIdIndex = cursor.getColumnIndex(Email.CONTACT_ID)
+            val emailIndex = cursor.getColumnIndex(Email.ADDRESS)
+//            val photoIndex = cursor.getColumnIndex(Photo.PHOTO_URI)
+            while (cursor.moveToNext()) {
+                val contactId = cursor.getString(contactIdIndex)
+                val address: String = cursor.getString(emailIndex)
+                //check if the map contains key or not, if not then create a new array list with number
+                if (contactsEmailMap.containsKey(contactId)) {
+                    contactsEmailMap[contactId]?.add(address)
+                } else {
+                    contactsEmailMap[contactId] = arrayListOf(address)
+                }
             }
+            //contact contains all the number of a particular contact
+            cursor.close()
         }
-        return "other"
+        return contactsEmailMap
+    }
+
+    override fun getContacts(promise: Promise) {
+        GlobalScope.launch {
+            val contactsListAsync = async { getPhoneContacts() }
+            val contactNumbersAsync = async { getContactNumbers() }
+            val contactEmailAsync = async { getContactEmails() }
+
+            val contacts = contactsListAsync.await()
+            val contactNumbers = contactNumbersAsync.await()
+            val contactEmails = contactEmailAsync.await()
+
+            val contactsArray = ArrayList<HashMap<String, Any?>>()
+
+            contacts.forEach {
+                val map = HashMap<String, Any?>()
+                map["name"] = it.name
+                contactNumbers[it.id]?.let { numbers ->
+                    map["phones"] = numbers
+                }
+                contactEmails[it.id]?.let { emails ->
+                    map["emails"] = emails
+                }
+                val contactUri: Uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, it.id.toLong())
+                val photoUri: Uri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                map["photo"] = photoUri.toString()
+
+                contactsArray.add(map)
+            }
+
+            promise.resolve(Arguments.makeNativeArray(contactsArray))
+        }
     }
 
     private fun sendEvent(
