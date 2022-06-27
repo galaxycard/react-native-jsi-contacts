@@ -1,6 +1,6 @@
 {
   "name": "@galaxycard/react-native-turbo-utils",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "React 0.68+ Turbo Module example with codegen with typescript for Objective-C and Java/Kotlin with C++ shared library",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
