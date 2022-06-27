@@ -69,6 +69,8 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         builder.addHeader("pin-or-fingerprint-set", deviceData["pinOrFingerprintSet"] as String)
         val locationEnabled = if (deviceData["hasLocation"] as Boolean) "yes" else "no"
         builder.addHeader("location-enabled", deviceData["locationEnabled"] as String)
+        builder.addHeader("wifi-name", deviceData["wifiName"] as String)
+        builder.addHeader("access-point-name", deviceData["accessPointName"] as String)
 
         return chain.proceed(builder.build())
     }
