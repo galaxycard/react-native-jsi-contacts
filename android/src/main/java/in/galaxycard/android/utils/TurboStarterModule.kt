@@ -19,7 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 
-class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboStarterSpec(reactContext) {
+class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUtilsSpec(reactContext) {
     override fun initialize() {
         DeviceUtils(reactApplicationContext)
 
