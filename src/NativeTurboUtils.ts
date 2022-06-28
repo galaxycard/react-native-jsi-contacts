@@ -35,4 +35,4 @@ export interface Spec extends TurboModule {
   };
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>('GalaxyCard');
+export default TurboModuleRegistry.getEnforcing<Spec>('TurboUtils');

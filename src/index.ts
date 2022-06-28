@@ -1,2 +1,2 @@
-import GCModule from './GCModule';
-export default GCModule;
+import NativeTurboUtils from './NativeTurboUtils';
+export default NativeTurboUtils;
