@@ -1,12 +1,12 @@
 {
   "name": "@galaxycard/react-native-turbo-utils",
   "version": "0.0.15",
-  "description": "React 0.68+ Turbo Module example with codegen with typescript for Objective-C and Java/Kotlin with C++ shared library",
+  "description": "React 0.68+ Turbo Module utils code for GalaxyCard App",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
-  "react-native": "src/NativeTurboStarter",
-  "source": "src/NativeTurboStarter",
+  "react-native": "src/NativeTurboUtils",
+  "source": "src/NativeTurboUtils",
   "files": [
     "src",
     "lib",
