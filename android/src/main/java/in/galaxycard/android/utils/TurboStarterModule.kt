@@ -13,7 +13,6 @@ import android.os.Process.myPid
 import android.os.Process.myUid
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.*
-import android.provider.Settings.Secure.getString
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
 import com.facebook.react.bridge.*
