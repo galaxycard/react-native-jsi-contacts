@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.media.AudioManager
 import android.net.wifi.WifiManager
 import android.os.*
+import android.os.Process.myPid
 import android.provider.Settings
 import android.provider.Settings.Secure.getString
 import android.telephony.TelephonyManager
@@ -152,7 +153,7 @@ class DeviceUtils(private val context: Context) {
 
         val actMgr =
             context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val pid = Process.myPid()
+        val pid = myPid()
         val memInfos = actMgr.getProcessMemoryInfo(intArrayOf(pid))
         if (memInfos.size != 1) {
             System.err.println("Unable to getProcessMemoryInfo. getProcessMemoryInfo did not return any info for the PID")

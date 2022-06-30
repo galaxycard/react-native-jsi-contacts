@@ -9,6 +9,7 @@ import android.media.AudioManager
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.os.PowerManager
 import android.os.Process.myPid
 import android.os.Process.myUid
 import android.provider.ContactsContract
@@ -20,10 +21,13 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.security.MessageDigest
 
 class TurboStarterModule(reactContext: ReactApplicationContext?) :
     NativeTurboUtilsSpec(reactContext) {
+    private val PERMISSION_MISSING = "read_contact_permission_missing"
+
     override fun initialize() {
         DeviceUtils(reactApplicationContext)
 
@@ -143,13 +147,13 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             if (context.checkPermission(
                     permission.READ_CONTACTS,
-                    Process.myPid(),
-                    Process.myUid()
+                    myPid(),
+                    myUid()
                 ) != PackageManager.PERMISSION_GRANTED
             )
-                return promise.reject()
+                return promise.reject(PERMISSION_MISSING, Exception(PERMISSION_MISSING))
         } else if (context.checkSelfPermission(permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            return promise.reject()
+            return promise.reject(PERMISSION_MISSING, Exception(PERMISSION_MISSING))
         }
         GlobalScope.launch {
             val contactsListAsync = async { getPhoneContacts() }
