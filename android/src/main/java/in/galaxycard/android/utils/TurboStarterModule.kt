@@ -1,12 +1,16 @@
 package `in`.galaxycard.android.utils
 
+import android.Manifest.permission
 import android.content.*
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.location.LocationManager
 import android.media.AudioManager
 import android.net.Uri
 import android.net.wifi.WifiManager
-import android.os.*
+import android.os.Build
+import android.os.Process.myPid
+import android.os.Process.myUid
 import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.*
 import android.provider.Settings.Secure.getString
@@ -17,9 +21,10 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 
-
-class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUtilsSpec(reactContext) {
+class TurboStarterModule(reactContext: ReactApplicationContext?) :
+    NativeTurboUtilsSpec(reactContext) {
     override fun initialize() {
         DeviceUtils(reactApplicationContext)
 
@@ -62,7 +67,8 @@ class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUti
             null,
             null,
             null,
-            Phone.DISPLAY_NAME + " ASC")
+            ContactsContract.Contacts._ID + " ASC"
+        )
         if (contactsCursor != null && contactsCursor.count > 0) {
             val idIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts._ID)
             val nameIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
@@ -83,7 +89,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUti
             null,
             null,
             null,
-            null
+            Phone.NUMBER + " ASC"
         )
         if (cursor != null && cursor.count > 0) {
             val contactIdIndex = cursor.getColumnIndex(Phone.CONTACT_ID)
@@ -111,7 +117,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUti
             null,
             null,
             null,
-            null
+            Email.ADDRESS + " ASC"
         )
         if (cursor != null && cursor.count > 0) {
             val contactIdIndex = cursor.getColumnIndex(Email.CONTACT_ID)
@@ -134,6 +140,18 @@ class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUti
     }
 
     override fun getContacts(promise: Promise) {
+        val context: Context = reactApplicationContext.getBaseContext()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (context.checkPermission(
+                    permission.READ_CONTACTS,
+                    Process.myPid(),
+                    Process.myUid()
+                ) != PackageManager.PERMISSION_GRANTED
+            )
+                return promise.reject()
+        } else if (context.checkSelfPermission(permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            return promise.reject()
+        }
         GlobalScope.launch {
             val contactsListAsync = async { getPhoneContacts() }
             val contactNumbersAsync = async { getContactNumbers() }
@@ -145,23 +163,50 @@ class TurboStarterModule(reactContext: ReactApplicationContext?): NativeTurboUti
 
             val contactsArray = ArrayList<HashMap<String, Any?>>()
 
-            contacts.forEach {
+            val digest: MessageDigest = MessageDigest.getInstance("MD5")
+
+            contacts.forEach { contact ->
+                digest.update(contact.id.toByteArray())
                 val map = HashMap<String, Any?>()
-                map["name"] = it.name
-                contactNumbers[it.id]?.let { numbers ->
+                map["name"] = contact.name
+                contactNumbers[contact.id]?.let { numbers ->
                     map["phones"] = numbers
+                    numbers.forEach {
+                        digest.update(it.toByteArray())
+                    }
                 }
-                contactEmails[it.id]?.let { emails ->
+                contactEmails[contact.id]?.let { emails ->
                     map["emails"] = emails
+                    emails.forEach {
+                        digest.update(it.toByteArray())
+                    }
                 }
-                val contactUri: Uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, it.id.toLong())
-                val photoUri: Uri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+                val contactUri: Uri = ContentUris.withAppendedId(
+                    ContactsContract.Contacts.CONTENT_URI,
+                    contact.id.toLong()
+                )
+                val photoUri: Uri = Uri.withAppendedPath(
+                    contactUri,
+                    ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
+                )
                 map["photo"] = photoUri.toString()
 
                 contactsArray.add(map)
             }
 
-            promise.resolve(Arguments.makeNativeArray(contactsArray))
+            val messageDigest: ByteArray = digest.digest()
+            val hexString = StringBuilder()
+            for (byte in messageDigest) {
+                val hex = StringBuilder(Integer.toHexString(0xFF and byte.toInt()))
+                while (hex.length < 2) hex.insert(0, "0")
+                hexString.append(hex)
+            }
+
+            val map = HashMap<String, Any>()
+            map["contacts"] = contactsArray
+            map["hash"] = hexString
+
+            promise.resolve(Arguments.makeNativeMap(map))
         }
     }
 

@@ -10,7 +10,7 @@ import android.content.pm.PackageInfo
 import android.location.LocationManager
 import android.media.AudioManager
 import android.net.wifi.WifiManager
-import android.os.*
+import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.Secure.getString
 import android.telephony.TelephonyManager
@@ -18,7 +18,6 @@ import androidx.core.content.pm.PackageInfoCompat
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import java.math.BigInteger
-
 
 class DeviceUtils(private val context: Context) {
     companion object {

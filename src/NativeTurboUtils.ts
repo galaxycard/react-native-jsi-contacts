@@ -3,19 +3,10 @@ import { TurboModule, TurboModuleRegistry } from 'react-native';
 import type { Contact } from './types';
 
 export interface Spec extends TurboModule {
-  getContacts(): Promise<Contact[]>;
-  // getConstants(): {
-  //   uniqueId: string;
-  //   deviceId: string;
-  //   bundleId: string;
-  //   systemVersion: string;
-  //   appVersion: string;
-  //   buildNumber: string;
-  //   appName: string;
-  //   brand: string;
-  //   model: string;
-  //   installReferrer: string;
-  // };
+  getContacts(): Promise<{
+    contacts: Contact[];
+    hash: string;
+  }>;
   getDeviceData(): {
     hasHeadphones: boolean;
     carrier: string;
