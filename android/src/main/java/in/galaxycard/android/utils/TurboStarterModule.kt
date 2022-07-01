@@ -230,7 +230,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
 //    private external fun nativeMultiply(num1: Double, num2: Double): Double
 
     companion object {
-        const val NAME = "GalaxyCard"
+        const val NAME = "TurboUtils"
 
         init {
             System.loadLibrary("reactnativeturboutils-jni")
