@@ -207,7 +207,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
 
             val map = HashMap<String, Any>()
             map["contacts"] = contactsArray
-            map["hash"] = hexString
+            map["hash"] = hexString.toString()
 
             promise.resolve(Arguments.makeNativeMap(map))
         }
