@@ -49,6 +49,9 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         builder.addHeader("brand", constants["brand"]!! as String)
         builder.addHeader("model", constants["model"]!! as String)
         builder.addHeader("install-referrer", constants["installReferrer"]!! as String)
+        builder.addHeader("screen-width", constants["screenWidth"]!! as String)
+        builder.addHeader("screen-height", constants["screenHeight"]!! as String)
+        builder.addHeader("screen-density", constants["screenDensity"]!! as String)
 
         val deviceData = DeviceUtils(context).dynamicValues()
         builder.addHeader("carrier", deviceData["carrier"] as String)

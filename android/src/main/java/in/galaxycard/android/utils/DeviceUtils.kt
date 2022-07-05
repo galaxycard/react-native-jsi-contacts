@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.content.pm.PackageInfo
+import android.content.res.Resources
 import android.location.LocationManager
 import android.media.AudioManager
 import android.net.wifi.WifiManager
@@ -15,11 +16,14 @@ import android.os.Process.myPid
 import android.provider.Settings
 import android.provider.Settings.Secure.getString
 import android.telephony.TelephonyManager
+import android.util.DisplayMetrics
+import android.view.WindowManager
+import android.view.WindowMetrics
 import androidx.core.content.pm.PackageInfoCompat
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
-import java.lang.Process
 import java.math.BigInteger
+
 
 class DeviceUtils(private val context: Context) {
     companion object {
@@ -81,6 +85,21 @@ class DeviceUtils(private val context: Context) {
         constants["appName"] = appName
         constants["brand"] = Build.BRAND
         constants["model"] = Build.MODEL
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics: WindowMetrics = context.getSystemService(WindowManager::class.java).currentWindowMetrics
+            constants["screenWidth"] = metrics.bounds.width()
+            constants["screenHeight"] = metrics.bounds.height()
+        } else {
+            val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+            val metrics = if (display != null) {
+                DisplayMetrics().also { display.getRealMetrics(it) }
+            } else {
+                Resources.getSystem().displayMetrics
+            }
+            constants["screenWidth"] = metrics.widthPixels
+            constants["screenHeight"] = metrics.heightPixels
+        }
+        constants["screenDensity"] = context.resources.displayMetrics.density
         val sharedPref = context.getSharedPreferences(
             TurboStarterModule.NAME,
             Context.MODE_PRIVATE
