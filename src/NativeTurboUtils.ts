@@ -3,7 +3,7 @@ import { TurboModule, TurboModuleRegistry } from 'react-native';
 import type { Contact } from './types';
 
 export interface Spec extends TurboModule {
-  getConstants(): () => {
+  getConstants(): {
     uniqueId: string;
     deviceId: string;
     bundleId: string;
