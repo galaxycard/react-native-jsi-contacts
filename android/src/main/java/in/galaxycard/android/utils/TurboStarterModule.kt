@@ -59,6 +59,10 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         reactApplicationContext.registerReceiver(receiver, filter)
     }
 
+    override fun getConstants(): MutableMap<String, Any> {
+        return DeviceUtils(reactApplicationContext).constants()
+    }
+
     override fun getDeviceData(): WritableNativeMap {
         return Arguments.makeNativeMap(DeviceUtils(reactApplicationContext).dynamicValues())
     }
