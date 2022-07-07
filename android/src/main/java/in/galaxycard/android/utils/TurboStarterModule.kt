@@ -59,7 +59,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         reactApplicationContext.registerReceiver(receiver, filter)
     }
 
-    override fun getConstants(): MutableMap<String, Any> {
+    override fun getTypedExportedConstants(): MutableMap<String, Any> {
         return DeviceUtils(reactApplicationContext).constants()
     }
 
