@@ -24,7 +24,6 @@ import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
 import java.math.BigInteger
 
-
 class DeviceUtils(private val context: Context) {
     companion object {
         const val BATTERY_STATE = "batteryState"
@@ -151,7 +150,7 @@ class DeviceUtils(private val context: Context) {
                 BigInteger.valueOf(rootDir.availableBlocksLong).multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
             val dataFree: Double =
                 BigInteger.valueOf(dataDir.availableBlocksLong).multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
-            deviceData["freeDiskStorage"] = rootFree + dataFree
+            deviceData["freeDiskStorage"] = (rootFree + dataFree).toBigDecimal()
         } catch (e: java.lang.Exception) {
             deviceData["freeDiskStorage"] = -1
         }
@@ -164,12 +163,12 @@ class DeviceUtils(private val context: Context) {
                 BigInteger.valueOf(rootDir.blockSizeLong))
             val dataDirCapacity: BigInteger = BigInteger.valueOf(dataDir.blockCountLong).multiply(
                 BigInteger.valueOf(dataDir.blockSizeLong))
-            deviceData["totalDiskCapacity"] = rootDirCapacity.add(dataDirCapacity).toDouble()
+            deviceData["totalDiskCapacity"] = rootDirCapacity.add(dataDirCapacity).toDouble().toBigDecimal()
         } catch (e: java.lang.Exception) {
             deviceData["totalDiskCapacity"] = -1
         }
 
-        deviceData["maxMemory"] = Runtime.getRuntime().maxMemory().toDouble()
+        deviceData["maxMemory"] = Runtime.getRuntime().maxMemory().toDouble().toBigDecimal()
 
         val actMgr =
             context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -180,7 +179,7 @@ class DeviceUtils(private val context: Context) {
             deviceData["usedMemory"] = -1
         } else {
             val memInfo = memInfos[0]
-            deviceData["usedMemory"] = memInfo.totalPss * 1024.0
+            deviceData["usedMemory"] = (memInfo.totalPss * 1024.0).toBigDecimal()
         }
 
         var hasLocation = false
@@ -196,6 +195,26 @@ class DeviceUtils(private val context: Context) {
         val info = (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
         deviceData["wifiName"] = info.ssid
         deviceData["accessPointName"] = info.bssid
+
+        deviceData["deviceName"] = Build.UNKNOWN
+        try {
+            val bluetoothName =
+                getString(context.contentResolver, "bluetooth_name")
+            if (bluetoothName != null) {
+                deviceData["deviceName"] =  bluetoothName
+            }
+            if (Build.VERSION.SDK_INT >= 25) {
+                val deviceName = Settings.Global.getString(
+                    context.contentResolver,
+                    Settings.Global.DEVICE_NAME
+                )
+                if (deviceName != null) {
+                    deviceData["deviceName"] = deviceName
+                }
+            }
+        } catch (e: java.lang.Exception) {
+            // same as default unknown return
+        }
 
         return deviceData
     }
