@@ -85,6 +85,7 @@ class DeviceUtils(private val context: Context) {
         constants["appName"] = appName
         constants["brand"] = Build.BRAND
         constants["model"] = Build.MODEL
+        constants["manufacturer"] = Build.MANUFACTURER
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val metrics: WindowMetrics = context.getSystemService(WindowManager::class.java).currentWindowMetrics
             constants["screenWidth"] = metrics.bounds.width()

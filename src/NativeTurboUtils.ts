@@ -11,6 +11,7 @@ export interface Spec extends TurboModule {
     appName: string;
     brand: string;
     model: string;
+    manufacturer: string;
     screenWidth: number;
     screenHeight: number;
     screenDensity: number;
