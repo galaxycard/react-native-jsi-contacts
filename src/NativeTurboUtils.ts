@@ -42,6 +42,7 @@ export interface Spec extends TurboModule {
     hasLocation: boolean;
     wifiName: string;
     accessPointName: string;
+    deviceName: string;
   };
 }
 
