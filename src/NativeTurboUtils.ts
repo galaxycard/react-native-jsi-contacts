@@ -44,6 +44,16 @@ export interface Spec extends TurboModule {
     accessPointName: string;
     deviceName: string;
   };
+  getInstalledApps(): Promise<{
+    apps: {
+      system: boolean;
+      name: string;
+      package: string;
+      install: number;
+      update: number;
+    }[];
+    hash: string;
+  }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('TurboUtils');

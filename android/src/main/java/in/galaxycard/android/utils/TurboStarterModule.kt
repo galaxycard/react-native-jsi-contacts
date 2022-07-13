@@ -2,6 +2,8 @@ package `in`.galaxycard.android.utils
 
 import android.Manifest.permission
 import android.content.*
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.location.LocationManager
@@ -17,17 +19,21 @@ import android.provider.ContactsContract.CommonDataKinds.*
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
 import com.facebook.react.bridge.*
+import com.facebook.react.bridge.WritableArray
+import com.facebook.react.bridge.WritableMap
+import com.facebook.react.bridge.WritableNativeArray
+import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.lang.Exception
+import java.lang.reflect.Field
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+
 
 class TurboStarterModule(reactContext: ReactApplicationContext?) :
     NativeTurboUtilsSpec(reactContext) {
-    private val PERMISSION_MISSING = "read_contact_permission_missing"
-
     override fun initialize() {
         DeviceUtils(reactApplicationContext)
 
@@ -217,6 +223,76 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         }
     }
 
+    override fun getInstalledApps(promise: Promise) {
+        //get a list of installed apps.
+        val packageManager = reactApplicationContext.packageManager
+        val packages = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        val concatenatedNames = StringBuilder()
+        val appsList = ArrayList<HashMap<String, Any>>()
+        var packageName: String
+        for (applicationInfo in packages) {
+            if (packageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null) {
+                val appDetails = HashMap<String, Any>()
+                appDetails[PACKAGE] = applicationInfo.packageName
+                appDetails[DISPLAY_NAME] = packageManager.getApplicationLabel(applicationInfo).toString()
+                appDetails[SYSTEM] = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM !== 0
+                packageName = applicationInfo.packageName
+                concatenatedNames.append(packageName)
+                val times = installTimeFromPackageManager(packageManager, packageName)
+                if (times.isNotEmpty()) {
+                    concatenatedNames.append(times[INSTALL])
+                    concatenatedNames.append(times[UPDATE])
+                    appDetails[INSTALL] = times[INSTALL] as Long
+                    appDetails[UPDATE] = times[UPDATE] as Long
+                }
+                appsList.add(appDetails)
+            }
+        }
+        val hash: String = md5(concatenatedNames.toString())
+        val appsWithHash = HashMap<String, Any>()
+        appsWithHash[APPS] = appsList
+        appsWithHash[HASH] = hash
+        promise.resolve(Arguments.makeNativeMap(appsWithHash))
+    }
+
+    private fun installTimeFromPackageManager(
+        packageManager: PackageManager,
+        packageName: String
+    ): HashMap<String, Long> {
+        // API level 9 and above have the "firstInstallTime" field.
+        // Check for it with reflection and return if present.
+        val times = HashMap<String, Long>()
+        try {
+            val info: PackageInfo = packageManager.getPackageInfo(packageName, 0)
+            var field: Field = PackageInfo::class.java.getField("firstInstallTime")
+            times[INSTALL] = field.getLong(info)
+            field = PackageInfo::class.java.getField("lastUpdateTime")
+            times[UPDATE] = field.getLong(info)
+        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: IllegalAccessException) {
+        } catch (e: NoSuchFieldException) {
+        } catch (e: IllegalArgumentException) {
+        } catch (e: SecurityException) {
+        }
+        return times
+    }
+
+    private fun md5(s: String): String {
+        try {
+            val digest = MessageDigest.getInstance(HASH_ALGO)
+            digest.update(s.toByteArray())
+            val messageDigest = digest.digest()
+            val hexString = java.lang.StringBuilder()
+            for (b in messageDigest) {
+                hexString.append(Integer.toHexString(0xFF and b.toInt()))
+            }
+            return hexString.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        }
+        return ""
+    }
+
     private fun sendEvent(
         reactContext: ReactContext,
         eventName: String,
@@ -235,6 +311,15 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
 
     companion object {
         const val NAME = "TurboUtils"
+        const val HASH_ALGO = "MD5"
+        const val PERMISSION_MISSING = "read_contact_permission_missing"
+        const val SYSTEM = "system"
+        const val INSTALL = "install"
+        const val UPDATE = "update"
+        const val DISPLAY_NAME = "name"
+        const val PACKAGE = "package"
+        const val HASH = "hash"
+        const val APPS = "apps"
 
         init {
             System.loadLibrary("reactnativeturboutils-jni")
