@@ -257,21 +257,24 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun parseJwt(jws: String, key: String?): WritableNativeMap {
-        var jwsString = jws
-
         val jwsBuilder = Jwts.parserBuilder()
 
-        if (key == null) {
+        return if (key == null) {
             val i = jws.lastIndexOf('.')
-            jwsString = jws.substring(0, i + 1)
+            val untrusted = jwsBuilder.build()
+                .parseClaimsJwt(jws.substring(0, i + 1))
+
+            Arguments.makeNativeMap(untrusted.body)
         } else {
             val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
-            jwsBuilder.setSigningKeyResolver(signingKeyResolver)
-        }
-        val trusted = jwsBuilder.build()
-            .parseClaimsJws(jwsString)
 
-        return Arguments.makeNativeMap(trusted.body);
+            val trusted = jwsBuilder
+                .setSigningKeyResolver(signingKeyResolver)
+                .build()
+                .parseClaimsJws(jws)
+
+            Arguments.makeNativeMap(trusted.body)
+        }
     }
 
     private fun installTimeFromPackageManager(
