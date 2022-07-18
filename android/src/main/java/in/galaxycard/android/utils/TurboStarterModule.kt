@@ -24,6 +24,7 @@ import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeArray
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import io.jsonwebtoken.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -253,6 +254,24 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         appsWithHash[APPS] = appsList
         appsWithHash[HASH] = hash
         promise.resolve(Arguments.makeNativeMap(appsWithHash))
+    }
+
+    override fun parseJwt(jws: String, key: String?): WritableNativeMap {
+        var jwsString = jws
+
+        val jwsBuilder = Jwts.parserBuilder()
+
+        if (key == null) {
+            val i = jws.lastIndexOf('.')
+            jwsString = jws.substring(0, i + 1)
+        } else {
+            val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
+            jwsBuilder.setSigningKeyResolver(signingKeyResolver)
+        }
+        val trusted = jwsBuilder.build()
+            .parseClaimsJws(jwsString)
+
+        return Arguments.makeNativeMap(trusted.body);
     }
 
     private fun installTimeFromPackageManager(

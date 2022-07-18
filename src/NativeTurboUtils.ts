@@ -54,6 +54,17 @@ export interface Spec extends TurboModule {
     }[];
     hash: string;
   }>;
+  parseJwt(
+    jwt: string,
+    key?: string
+  ): {
+    user_id: number;
+    phone: number;
+    email: string;
+    status: string;
+    status_data: string;
+    name: string;
+  };
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('TurboUtils');
