@@ -91,6 +91,11 @@ dependencies {
     implementation project(':ReactAndroid')
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
     implementation 'com.android.installreferrer:installreferrer:2.2'
+    api 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5' 
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
+        exclude group: 'org.json', module: 'json' //provided by Android natively
+    }
 }
 
 if (isNewArchitectureEnabled()) {

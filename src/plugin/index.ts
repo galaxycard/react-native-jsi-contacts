@@ -2,6 +2,7 @@ import {
   AndroidConfig,
   ConfigPlugin,
   createRunOncePlugin,
+  withAppBuildGradle,
   withMainApplication,
   withPlugins,
   withProjectBuildGradle,
@@ -45,6 +46,21 @@ const withKotlinGradlePlugin: ConfigPlugin = (config) => {
   });
 };
 
+const withJjwt: ConfigPlugin = (config) => {
+  return withAppBuildGradle(config, async (config) => {
+    // config.modResults.contents = config.modResults.contents.replace(
+    //   /^dependencies {/,
+    //   `dependencies {
+    //       api 'io.jsonwebtoken:jjwt-api:0.11.5'
+    //       runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    //       runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
+    //           exclude group: 'org.json', module: 'json' //provided by Android natively
+    //       }`
+    // );
+    return config;
+  });
+};
+
 const withGalaxyCardUtils: ConfigPlugin = (config) => {
   const androidPermissions = [
     'android.permission.ACCESS_WIFI_STATE',
@@ -54,6 +70,7 @@ const withGalaxyCardUtils: ConfigPlugin = (config) => {
   return withPlugins(config, [
     withHeaderInterceptor,
     withKotlinGradlePlugin,
+    withJjwt,
     [AndroidConfig.Permissions.withPermissions, androidPermissions],
   ]);
 };
