@@ -56,7 +56,7 @@ export interface Spec extends TurboModule {
   }>;
   parseJwt(
     jwt: string,
-    key?: string
+    key: string | null
   ): {
     user_id: number;
     phone: number;
