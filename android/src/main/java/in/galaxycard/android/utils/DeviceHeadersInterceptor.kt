@@ -46,6 +46,8 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         val constants = DeviceUtils(context).constants()
         builder.addHeader("device", constants["uniqueId"]!! as String)
         builder.addHeader("build", constants["buildNumber"]!! as String)
+        builder.addHeader("build-number", constants["buildNumber"]!! as String)
+        builder.addHeader("app-version", constants["appVersion"]!! as String)
         builder.addHeader("os-version", constants["systemVersion"]!! as String)
         builder.addHeader("device-code", constants["deviceId"]!! as String)
         builder.addHeader("brand", constants["brand"]!! as String)
