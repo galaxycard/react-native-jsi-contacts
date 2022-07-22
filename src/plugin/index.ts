@@ -31,6 +31,12 @@ public class MainApplication extends Application implements ReactApplication, Ok
   }
   `
     );
+    config.modResults.contents = config.modResults.contents.replace(
+      'super.onCreate();',
+      `super.onCreate();
+      OkHttpClientProvider.setOkHttpClientFactory(this);
+`
+    );
     return config;
   });
 };
