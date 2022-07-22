@@ -193,8 +193,14 @@ class DeviceUtils(private val context: Context) {
         deviceData["hasLocation"] = hasLocation
 
         val info = (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
-        deviceData["wifiName"] = info.ssid
-        deviceData["accessPointName"] = info.bssid
+        deviceData["wifiName"] = Build.UNKNOWN
+        if (info != null && info.ssid !== null) {
+            deviceData["wifiName"] = info.ssid
+        }
+        deviceData["accessPointName"] = Build.UNKNOWN
+        if (info != null && info.bssid !== null) {
+            deviceData["accessPointName"] = info.bssid
+        }
 
         deviceData["deviceName"] = Build.UNKNOWN
         try {
