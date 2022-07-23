@@ -19,7 +19,6 @@ import android.provider.ContactsContract.CommonDataKinds.*
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
 
-import com.bugsnag.android.Bugsnag
 import com.facebook.react.bridge.*
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
@@ -258,28 +257,23 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
     }
 
     override fun parseJwt(jws: String, key: String?): WritableNativeMap {
-        try {
-            val jwsBuilder = Jwts.parserBuilder()
+        val jwsBuilder = Jwts.parserBuilder()
 
-            return if (key == null) {
-                val i = jws.lastIndexOf('.')
-                val untrusted = jwsBuilder.build()
-                    .parseClaimsJwt(jws.substring(0, i + 1))
+        return if (key == null) {
+            val i = jws.lastIndexOf('.')
+            val untrusted = jwsBuilder.build()
+                .parseClaimsJwt(jws.substring(0, i + 1))
 
-                Arguments.makeNativeMap(untrusted.body)
-            } else {
-                val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
+            Arguments.makeNativeMap(untrusted.body)
+        } else {
+            val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
 
-                val trusted = jwsBuilder
-                    .setSigningKeyResolver(signingKeyResolver)
-                    .build()
-                    .parseClaimsJws(jws)
+            val trusted = jwsBuilder
+                .setSigningKeyResolver(signingKeyResolver)
+                .build()
+                .parseClaimsJws(jws)
 
-                Arguments.makeNativeMap(trusted.body)
-            }
-        } catch (e: Throwable) {
-            Bugsnag.notify(e)
-            throw e
+            Arguments.makeNativeMap(trusted.body)
         }
     }
 
