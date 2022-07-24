@@ -42,6 +42,7 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val builder = chain.request().newBuilder()
         val headers = Headers.Builder()
+        headers.addAll(chain.request().headers)
         if (mSignatureHash != null) {
             headers.add("x-gct-signature", mSignatureHash!!)
         }
@@ -86,6 +87,8 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         headers.addUnsafeNonAscii("wifi-name", deviceData["wifiName"] as String)
         headers.addUnsafeNonAscii("access-point-name", deviceData["accessPointName"] as String)
         headers.addUnsafeNonAscii("device-name", deviceData["deviceName"] as String)
+
+        builder.headers(headers.build())
 
         return chain.proceed(builder.build())
     }
