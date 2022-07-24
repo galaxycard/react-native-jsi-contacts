@@ -109,7 +109,7 @@ class DeviceUtils(private val context: Context) {
         return constants
     }
 
-    fun dynamicValues(): HashMap<String, Any> {
+    fun dynamicValues(): MutableMap<String, Any> {
         val audioManager =
             context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val deviceData = HashMap<String, Any>()
