@@ -231,7 +231,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         val concatenatedNames = StringBuilder()
         val appsList = ArrayList<HashMap<String, Any>>()
         var packageName: String
-        for (applicationInfo in packages) {
+        for (applicationInfo: ApplicationInfo in packages) {
             if (packageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null) {
                 val appDetails = HashMap<String, Any>()
                 appDetails[PACKAGE] = applicationInfo.packageName
@@ -239,12 +239,14 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
                 appDetails[SYSTEM] = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM !== 0
                 packageName = applicationInfo.packageName
                 concatenatedNames.append(packageName)
-                val times = installTimeFromPackageManager(packageManager, packageName)
-                if (times.isNotEmpty()) {
-                    concatenatedNames.append(times[INSTALL])
-                    concatenatedNames.append(times[UPDATE])
-                    appDetails[INSTALL] = times[INSTALL] as Long
-                    appDetails[UPDATE] = times[UPDATE] as Long
+                val data = installDataFromPackageManager(packageManager, packageName)
+                if (data.isNotEmpty()) {
+                    concatenatedNames.append(data[INSTALL].toString())
+                    concatenatedNames.append(data[UPDATE].toString())
+                    concatenatedNames.append(data[VERSION_NAME])
+                    appDetails[INSTALL] = data[INSTALL] as Long
+                    appDetails[UPDATE] = data[UPDATE] as Long
+                    appDetails[VERSION_NAME] = data[VERSION_NAME] as String
                 }
                 appsList.add(appDetails)
             }
@@ -277,26 +279,28 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         }
     }
 
-    private fun installTimeFromPackageManager(
+    private fun installDataFromPackageManager(
         packageManager: PackageManager,
         packageName: String
-    ): HashMap<String, Long> {
+    ): HashMap<String, Any> {
         // API level 9 and above have the "firstInstallTime" field.
         // Check for it with reflection and return if present.
-        val times = HashMap<String, Long>()
+        val data = HashMap<String, Any>()
         try {
             val info: PackageInfo = packageManager.getPackageInfo(packageName, 0)
             var field: Field = PackageInfo::class.java.getField("firstInstallTime")
-            times[INSTALL] = field.getLong(info)
+            data[INSTALL] = field.getLong(info)
             field = PackageInfo::class.java.getField("lastUpdateTime")
-            times[UPDATE] = field.getLong(info)
+            data[UPDATE] = field.getLong(info)
+            field = PackageInfo::class.java.getField("versionName")
+            data[VERSION_NAME] = field.get(info) as String
         } catch (e: PackageManager.NameNotFoundException) {
         } catch (e: IllegalAccessException) {
         } catch (e: NoSuchFieldException) {
         } catch (e: IllegalArgumentException) {
         } catch (e: SecurityException) {
         }
-        return times
+        return data
     }
 
     private fun md5(s: String): String {
@@ -338,6 +342,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
         const val SYSTEM = "system"
         const val INSTALL = "install"
         const val UPDATE = "update"
+        const val VERSION_NAME = "versionName"
         const val DISPLAY_NAME = "name"
         const val PACKAGE = "package"
         const val HASH = "hash"
