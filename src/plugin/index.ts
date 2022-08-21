@@ -2,11 +2,16 @@ import {
   AndroidConfig,
   ConfigPlugin,
   createRunOncePlugin,
+  withAndroidManifest,
   withAppBuildGradle,
+  withGradleProperties,
   withMainApplication,
   withPlugins,
   withProjectBuildGradle,
 } from '@expo/config-plugins';
+
+const { addMetaDataItemToMainApplication, getMainApplicationOrThrow } =
+  AndroidConfig.Manifest;
 
 const withHeaderInterceptor: ConfigPlugin = (config) => {
   return withMainApplication(config, async (config) => {
@@ -14,14 +19,15 @@ const withHeaderInterceptor: ConfigPlugin = (config) => {
     // This factory will include our Device Headers interceptor
     // to the NetworkModule of RN
     config.modResults.contents = config.modResults.contents.replace(
-      'public class MainApplication extends Application implements ReactApplication {',
+      /public class MainApplication(.*) {$/m,
       `import in.galaxycard.android.utils.DeviceHeadersInterceptor;
 import com.facebook.react.modules.network.OkHttpClientFactory;
 import com.facebook.react.modules.network.NetworkingModule;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import okhttp3.OkHttpClient;
+import com.bugsnag.android.Bugsnag;
 
-public class MainApplication extends Application implements ReactApplication, OkHttpClientFactory {
+public class MainApplication$1, OkHttpClientFactory {
   @Override
   public OkHttpClient createNewNetworkModuleClient() {
     OkHttpClient.Builder builder = OkHttpClientProvider.createClientBuilder(this);
@@ -33,51 +39,126 @@ public class MainApplication extends Application implements ReactApplication, Ok
     );
     config.modResults.contents = config.modResults.contents.replace(
       'super.onCreate();',
-      `super.onCreate();
-      OkHttpClientProvider.setOkHttpClientFactory(this);
-`
+      `$&
+    OkHttpClientProvider.setOkHttpClientFactory(this);`
     );
+    config.modResults.contents = config.modResults.contents.replace(
+      'SoLoader.init(this, /* native exopackage */ false);',
+      `$&
+
+    SoLoader.loadLibrary("bugsnag-ndk");
+    SoLoader.loadLibrary("bugsnag-plugin-android-anr");
+
+    Bugsnag.start(this);`
+    );
+
     return config;
   });
 };
 
-const withKotlinGradlePlugin: ConfigPlugin = (config) => {
+const withJcenter: ConfigPlugin = (config) => {
   return withProjectBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
-      "classpath('de.undercouch:gradle-download-task:4.1.2')",
-      "classpath('de.undercouch:gradle-download-task:4.1.2')\n" +
-        'classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"'
+      /google\(\)/g,
+      `$&
+        jcenter()`
+    );
+    config.modResults.contents = config.modResults.contents.replace(
+      /classpath\('de.undercouch:gradle-download-task.*?$/m,
+      `$&
+        classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`
     );
     return config;
   });
 };
 
-const withJjwt: ConfigPlugin = (config) => {
+const withBugsnag: ConfigPlugin = (config) => {
   return withAppBuildGradle(config, async (config) => {
-    // config.modResults.contents = config.modResults.contents.replace(
-    //   /^dependencies {/,
-    //   `dependencies {
-    //       api 'io.jsonwebtoken:jjwt-api:0.11.5'
-    //       runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    //       runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
-    //           exclude group: 'org.json', module: 'json' //provided by Android natively
-    //       }`
-    // );
+    config.modResults.contents = config.modResults.contents.replace(
+      'apply plugin: "com.android.application"',
+      `$&
+apply plugin: "com.bugsnag.android.gradle"`
+    );
+    config.modResults.contents = config.modResults.contents.replace(
+      /^apply from: .*react.gradle.*$/m,
+      `$&
+
+bugsnag {
+    uploadReactNativeMappings = true
+}`
+    );
+    config.modResults.contents = config.modResults.contents.replace(
+      'dependencies {',
+      `$&
+        implementation 'com.google.mlkit:barcode-scanning:17.0.2'
+        implementation 'com.facebook.android:facebook-core:12.0.1'
+    `
+    );
     return config;
   });
 };
 
-const withGalaxyCardUtils: ConfigPlugin = (config) => {
-  const androidPermissions = [
-    'android.permission.ACCESS_WIFI_STATE',
-    'android.permission.READ_CONTACTS',
-    'android.permission.ACCESS_NETWORK_STATE',
-  ];
+const withMetadata: ConfigPlugin<{
+  bugsnag: { apiKey: string };
+  facebook: { appId: string };
+}> = (
+  config,
+  props: { bugsnag: { apiKey: string }; facebook: { appId: string } }
+) => {
+  return withAndroidManifest(config, async (config) => {
+    const mainApplication = getMainApplicationOrThrow(config.modResults);
+    addMetaDataItemToMainApplication(
+      mainApplication,
+      'com.facebook.sdk.ApplicationId',
+      props.facebook.appId
+    );
+    addMetaDataItemToMainApplication(
+      mainApplication,
+      'com.bugsnag.android.API_KEY',
+      props.bugsnag.apiKey
+    );
+    return config;
+  });
+};
+
+const withProguard: ConfigPlugin = (config) => {
+  return withGradleProperties(config, async (config) => {
+    config.modResults.push({
+      type: 'property',
+      key: 'android.enableProguardInReleaseBuilds',
+      value: 'true',
+    });
+    config.modResults.push({
+      type: 'property',
+      key: 'android.kotlinVersion',
+      value: '1.6.0',
+    });
+    config.modResults = config.modResults.map((item) => {
+      if (item.type === 'property' && item.key === 'expo.webp.animated') {
+        item.value = 'true';
+      }
+      if (item.type === 'property' && item.key === 'newArchEnabled') {
+        item.value = 'true';
+      }
+      return item;
+    });
+    return config;
+  });
+};
+
+const withGalaxyCardUtils: ConfigPlugin<{
+  bugsnag: { apiKey: string };
+  facebook: { appId: string };
+}> = (
+  config,
+  props: { bugsnag: { apiKey: string }; facebook: { appId: string } }
+) => {
   return withPlugins(config, [
     withHeaderInterceptor,
-    withKotlinGradlePlugin,
-    withJjwt,
-    [AndroidConfig.Permissions.withPermissions, androidPermissions],
+    withJcenter,
+    withBugsnag,
+    [withMetadata, props],
+    withProguard,
   ]);
 };
 
