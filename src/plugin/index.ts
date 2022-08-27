@@ -56,13 +56,8 @@ public class MainApplication$1, OkHttpClientFactory {
   });
 };
 
-const withJcenter: ConfigPlugin = (config) => {
+const withBugsnagPlugin: ConfigPlugin = (config) => {
   return withProjectBuildGradle(config, async (config) => {
-    config.modResults.contents = config.modResults.contents.replace(
-      /google\(\)/g,
-      `$&
-        jcenter()`
-    );
     config.modResults.contents = config.modResults.contents.replace(
       /classpath\('de.undercouch:gradle-download-task.*?$/m,
       `$&
@@ -155,7 +150,7 @@ const withGalaxyCardUtils: ConfigPlugin<{
 ) => {
   return withPlugins(config, [
     withHeaderInterceptor,
-    withJcenter,
+    withBugsnagPlugin,
     withBugsnag,
     [withMetadata, props],
     withProguard,
