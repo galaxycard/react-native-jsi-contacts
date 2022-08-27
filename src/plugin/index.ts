@@ -83,7 +83,7 @@ bugsnag {
 }`
     );
     config.modResults.contents = config.modResults.contents.replace(
-      'dependencies {',
+      /dependencies {/,
       `$&
         implementation 'com.google.mlkit:barcode-scanning:17.0.2'
         implementation 'com.facebook.android:facebook-core:12.0.1'
