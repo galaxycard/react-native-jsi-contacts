@@ -1,6 +1,6 @@
 {
   "name": "@galaxycard/react-native-turbo-utils",
-  "version": "0.0.44",
+  "version": "0.0.45",
   "description": "React 0.68+ Turbo Module utils code for GalaxyCard App",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
