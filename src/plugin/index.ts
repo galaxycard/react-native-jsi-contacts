@@ -85,8 +85,8 @@ bugsnag {
     config.modResults.contents = config.modResults.contents.replace(
       /dependencies {/,
       `$&
-        implementation 'com.google.mlkit:barcode-scanning:17.0.2'
-        implementation 'com.facebook.android:facebook-core:12.0.1'
+    implementation 'com.google.mlkit:barcode-scanning:17.0.2'
+    implementation 'com.facebook.android:facebook-core:12.0.1'
     `
     );
     return config;
@@ -120,18 +120,13 @@ const withProguard: ConfigPlugin = (config) => {
   return withGradleProperties(config, async (config) => {
     config.modResults.push({
       type: 'property',
-      key: 'android.enableProguardInReleaseBuilds',
-      value: 'true',
-    });
-    config.modResults.push({
-      type: 'property',
       key: 'android.kotlinVersion',
       value: '1.6.0',
     });
     config.modResults = config.modResults.map((item) => {
-      if (item.type === 'property' && item.key === 'expo.webp.animated') {
-        item.value = 'true';
-      }
+      // if (item.type === 'property' && item.key === 'expo.webp.animated') {
+      //   item.value = 'true';
+      // }
       if (item.type === 'property' && item.key === 'newArchEnabled') {
         item.value = 'true';
       }
