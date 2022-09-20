@@ -49,8 +49,6 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         val constants = DeviceUtils(context).constants()
         if (chain.request().header("device") == null) {
             headers.add("device", constants["uniqueId"]!! as String)
-        } else {
-            headers.add("device", chain.request().header("device")!!)
         }
         headers.add("build", constants["buildNumber"]!! as String)
         headers.add("build-number", constants["buildNumber"]!! as String)
