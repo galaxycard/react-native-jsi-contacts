@@ -10,10 +10,24 @@ import {
   withProjectBuildGradle,
 } from '@expo/config-plugins';
 
+interface AdGydeProps {
+  adgydeKey: string;
+}
+
+interface BugsnagProps {
+  bugsnagKey: string;
+}
+
+interface FacebookProps {
+  facebookAppId: string;
+}
+
+interface Props extends AdGydeProps, BugsnagProps, FacebookProps {}
+
 const { addMetaDataItemToMainApplication, getMainApplicationOrThrow } =
   AndroidConfig.Manifest;
 
-const withHeaderInterceptor: ConfigPlugin = (config) => {
+const withHeaderInterceptor: ConfigPlugin<Props> = (config, props: Props) => {
   return withMainApplication(config, async (config) => {
     // Add an OkHttpClientFactory
     // This factory will include our Device Headers interceptor
@@ -26,6 +40,7 @@ import com.facebook.react.modules.network.NetworkingModule;
 import com.facebook.react.modules.network.OkHttpClientProvider;
 import okhttp3.OkHttpClient;
 import com.bugsnag.android.Bugsnag;
+import com.adgyde.android.AdGyde;
 
 public class MainApplication$1, OkHttpClientFactory {
   @Override
@@ -40,7 +55,9 @@ public class MainApplication$1, OkHttpClientFactory {
     config.modResults.contents = config.modResults.contents.replace(
       'super.onCreate();',
       `$&
-    OkHttpClientProvider.setOkHttpClientFactory(this);`
+    OkHttpClientProvider.setOkHttpClientFactory(this);
+    AdGyde.init(this, "${props.adgydeKey}", "Organic");
+    AdGyde.setDebugEnabled(BuildConfig.DEBUG);`
     );
     config.modResults.contents = config.modResults.contents.replace(
       'SoLoader.init(this, /* native exopackage */ false);',
@@ -87,30 +104,25 @@ bugsnag {
       `$&
     implementation 'com.google.mlkit:barcode-scanning:17.0.2'
     implementation 'com.facebook.android:facebook-core:12.0.1'
-    `
+    implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'
+    implementation 'com.android.installreferrer:installreferrer:2.2'`
     );
     return config;
   });
 };
 
-const withMetadata: ConfigPlugin<{
-  bugsnag: { apiKey: string };
-  facebook: { appId: string };
-}> = (
-  config,
-  props: { bugsnag: { apiKey: string }; facebook: { appId: string } }
-) => {
+const withMetadata: ConfigPlugin<Props> = (config, props: Props) => {
   return withAndroidManifest(config, async (config) => {
     const mainApplication = getMainApplicationOrThrow(config.modResults);
     addMetaDataItemToMainApplication(
       mainApplication,
       'com.facebook.sdk.ApplicationId',
-      props.facebook.appId
+      props.facebookAppId
     );
     addMetaDataItemToMainApplication(
       mainApplication,
       'com.bugsnag.android.API_KEY',
-      props.bugsnag.apiKey
+      props.bugsnagKey
     );
     return config;
   });
@@ -136,15 +148,9 @@ const withProguard: ConfigPlugin = (config) => {
   });
 };
 
-const withGalaxyCardUtils: ConfigPlugin<{
-  bugsnag: { apiKey: string };
-  facebook: { appId: string };
-}> = (
-  config,
-  props: { bugsnag: { apiKey: string }; facebook: { appId: string } }
-) => {
+const withGalaxyCardUtils: ConfigPlugin<Props> = (config, props: Props) => {
   return withPlugins(config, [
-    withHeaderInterceptor,
+    [withHeaderInterceptor, props],
     withBugsnagPlugin,
     withBugsnag,
     [withMetadata, props],
