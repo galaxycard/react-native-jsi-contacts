@@ -87,13 +87,9 @@ const withBugsnagPlugin: ConfigPlugin = (config) => {
 const withBugsnag: ConfigPlugin = (config) => {
   return withAppBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
-      'apply plugin: "com.android.application"',
+      /^apply from: .*react.gradle")/m,
       `$&
-apply plugin: "com.bugsnag.android.gradle"`
-    );
-    config.modResults.contents = config.modResults.contents.replace(
-      /^apply from: .*react.gradle.*$/m,
-      `$&
+apply plugin: "com.bugsnag.android.gradle"
 
 bugsnag {
     uploadReactNativeMappings = true
