@@ -100,8 +100,7 @@ bugsnag {
       `$&
     implementation 'com.google.mlkit:barcode-scanning:17.0.2'
     implementation 'com.facebook.android:facebook-core:12.0.1'
-    implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'
-    implementation 'com.android.installreferrer:installreferrer:2.2'`
+    implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'`
     );
     return config;
   });
