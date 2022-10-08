@@ -22,6 +22,11 @@ import android.view.WindowMetrics
 import androidx.core.content.pm.PackageInfoCompat
 import com.android.installreferrer.api.InstallReferrerClient
 import com.android.installreferrer.api.InstallReferrerStateListener
+import com.miui.referrer.annotation.GetAppsReferrerResponse.Companion.FEATURE_NOT_SUPPORTED
+import com.miui.referrer.annotation.GetAppsReferrerResponse.Companion.OK
+import com.miui.referrer.annotation.GetAppsReferrerResponse.Companion.SERVICE_UNAVAILABLE
+import com.miui.referrer.api.GetAppsReferrerClient
+import com.miui.referrer.api.GetAppsReferrerStateListener
 import java.math.BigInteger
 
 class DeviceUtils(private val context: Context) {
@@ -34,7 +39,38 @@ class DeviceUtils(private val context: Context) {
 
     init {
         val sharedPreferences = context.getSharedPreferences(TurboStarterModule.NAME, Context.MODE_PRIVATE)
+        getInstallReferrerFromGetApps(sharedPreferences)
+        getInstallReferrerFromGooglePlay(sharedPreferences)
+    }
 
+    private fun getInstallReferrerFromGetApps(sharedPreferences: SharedPreferences) {
+        if (!sharedPreferences.contains(INSTALL_REFERRER)) {
+            val referrerClient = GetAppsReferrerClient.newBuilder(context).build()
+
+            referrerClient.startConnection(object : GetAppsReferrerStateListener {
+                override fun onGetAppsReferrerSetupFinished(state: Int) {
+                    when (state) {
+                        OK -> {
+                            val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                            editor.putString(
+                                INSTALL_REFERRER,
+                                referrerClient.installReferrer.installReferrer
+                            )
+                            editor.apply()
+                            referrerClient.endConnection()
+                        }
+                    }
+                }
+
+                override fun onGetAppsServiceDisconnected() {
+                    // Try to restart the connection on the next request to
+                    // GetApps by calling the startConnection() method.
+                }
+            })
+        }
+    }
+
+    private fun getInstallReferrerFromGooglePlay(sharedPreferences: SharedPreferences) {
         if (!sharedPreferences.contains(INSTALL_REFERRER)) {
             val referrerClient = InstallReferrerClient.newBuilder(context).build()
 
@@ -45,6 +81,7 @@ class DeviceUtils(private val context: Context) {
                             val editor: SharedPreferences.Editor = sharedPreferences.edit()
                             editor.putString(INSTALL_REFERRER, referrerClient.installReferrer.installReferrer)
                             editor.apply()
+                            referrerClient.endConnection()
                         }
                     }
                 }
