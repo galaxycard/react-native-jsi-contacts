@@ -18,8 +18,6 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.*
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
-
-import com.facebook.react.bridge.*
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.WritableNativeArray
@@ -29,6 +27,7 @@ import io.jsonwebtoken.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.io.InputStream
 import java.lang.reflect.Field
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -195,15 +194,23 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
                         digest.update(it.toByteArray())
                     }
                 }
-                val contactUri: Uri = ContentUris.withAppendedId(
-                    ContactsContract.Contacts.CONTENT_URI,
-                    contact.id.toLong()
-                )
-                val photoUri: Uri = Uri.withAppendedPath(
-                    contactUri,
-                    ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
-                )
-                map["photo"] = photoUri.toString()
+                val inputStream: InputStream? =
+                    ContactsContract.Contacts.openContactPhotoInputStream(
+                        reactApplicationContext.contentResolver,
+                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contact.id.toLong())
+                    )
+
+                if (inputStream != null) {
+                    val contactUri: Uri = ContentUris.withAppendedId(
+                        ContactsContract.Contacts.CONTENT_URI,
+                        contact.id.toLong()
+                    )
+                    val photoUri: Uri = Uri.withAppendedPath(
+                        contactUri,
+                        ContactsContract.Contacts.Photo.CONTENT_DIRECTORY
+                    )
+                    map["photo"] = photoUri.toString()
+                }
 
                 contactsArray.add(map)
             }
