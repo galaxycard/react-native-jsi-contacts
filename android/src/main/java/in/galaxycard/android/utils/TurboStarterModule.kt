@@ -18,10 +18,7 @@ import android.provider.ContactsContract
 import android.provider.ContactsContract.CommonDataKinds.*
 import android.telephony.CarrierConfigManager
 import android.telephony.TelephonyManager
-import com.facebook.react.bridge.WritableArray
-import com.facebook.react.bridge.WritableMap
-import com.facebook.react.bridge.WritableNativeArray
-import com.facebook.react.bridge.WritableNativeMap
+import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.jsonwebtoken.*
 import kotlinx.coroutines.GlobalScope
