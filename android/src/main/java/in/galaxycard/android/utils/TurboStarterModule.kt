@@ -178,6 +178,7 @@ class TurboStarterModule(reactContext: ReactApplicationContext?) :
             contacts.forEach { contact ->
                 digest.update(contact.id.toByteArray())
                 val map = HashMap<String, Any?>()
+                map["id] = contact.id
                 map["name"] = contact.name
                 contactNumbers[contact.id]?.let { numbers ->
                     map["phones"] = numbers

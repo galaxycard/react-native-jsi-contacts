@@ -19,6 +19,7 @@ export interface Spec extends TurboModule {
   };
   getContacts(): Promise<{
     contacts: {
+      id: number;
       name?: string;
       phones?: string[];
       emails?: string[];
