@@ -27,7 +27,7 @@ interface Props extends AdGydeProps, BugsnagProps, FacebookProps {}
 const { addMetaDataItemToMainApplication, getMainApplicationOrThrow } =
   AndroidConfig.Manifest;
 
-const withHeaderInterceptor: ConfigPlugin<Props> = (config, props: Props) => {
+const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
   return withMainApplication(config, async (config) => {
     // Add an OkHttpClientFactory
     // This factory will include our Device Headers interceptor
@@ -72,9 +72,8 @@ public class MainApplication$1, OkHttpClientFactory {
     return config;
   });
 };
-
-const withBugsnagPlugin: ConfigPlugin = (config) => {
-  return withProjectBuildGradle(config, async (config) => {
+const withBugsnagGradle: ConfigPlugin = (config) => {
+  config = withProjectBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
       /classpath\('de.undercouch:gradle-download-task.*?$/m,
       `$&
@@ -82,9 +81,6 @@ const withBugsnagPlugin: ConfigPlugin = (config) => {
     );
     return config;
   });
-};
-
-const withBugsnag: ConfigPlugin = (config) => {
   return withAppBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
       /^apply from: .*react.gradle.*$/m,
@@ -123,13 +119,8 @@ const withMetadata: ConfigPlugin<Props> = (config, props: Props) => {
   });
 };
 
-const withProguard: ConfigPlugin = (config) => {
+const withBuildProperties: ConfigPlugin = (config) => {
   return withGradleProperties(config, async (config) => {
-    config.modResults.push({
-      type: 'property',
-      key: 'android.kotlinVersion',
-      value: '1.6.0',
-    });
     config.modResults = config.modResults.map((item) => {
       // if (item.type === 'property' && item.key === 'expo.webp.animated') {
       //   item.value = 'true';
@@ -145,11 +136,10 @@ const withProguard: ConfigPlugin = (config) => {
 
 const withGalaxyCardUtils: ConfigPlugin<Props> = (config, props: Props) => {
   return withPlugins(config, [
-    [withHeaderInterceptor, props],
-    withBugsnagPlugin,
-    withBugsnag,
+    [withApplicationChanges, props],
+    withBugsnagGradle,
     [withMetadata, props],
-    withProguard,
+    withBuildProperties,
   ]);
 };
 
