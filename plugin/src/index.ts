@@ -35,38 +35,38 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
     config.modResults.contents = config.modResults.contents.replace(
       /public class MainApplication(.*) {$/m,
       `import in.galaxycard.android.utils.DeviceHeadersInterceptor;
-  import com.facebook.react.modules.network.OkHttpClientFactory;
-  import com.facebook.react.modules.network.NetworkingModule;
-  import com.facebook.react.modules.network.OkHttpClientProvider;
-  import okhttp3.OkHttpClient;
-  import com.bugsnag.android.Bugsnag;
-  import com.adgyde.android.AdGyde;
-  
-  public class MainApplication$1, OkHttpClientFactory {
-    @Override
-    public OkHttpClient createNewNetworkModuleClient() {
-      OkHttpClient.Builder builder = OkHttpClientProvider.createClientBuilder(this);
-      builder
-        .addNetworkInterceptor(new DeviceHeadersInterceptor(this));
-      return builder.build();
-    }
-    `
+    import com.facebook.react.modules.network.OkHttpClientFactory;
+    import com.facebook.react.modules.network.NetworkingModule;
+    import com.facebook.react.modules.network.OkHttpClientProvider;
+    import okhttp3.OkHttpClient;
+    import com.bugsnag.android.Bugsnag;
+    import com.adgyde.android.AdGyde;
+    
+    public class MainApplication$1, OkHttpClientFactory {
+      @Override
+      public OkHttpClient createNewNetworkModuleClient() {
+        OkHttpClient.Builder builder = OkHttpClientProvider.createClientBuilder(this);
+        builder
+          .addNetworkInterceptor(new DeviceHeadersInterceptor(this));
+        return builder.build();
+      }
+      `
     );
     config.modResults.contents = config.modResults.contents.replace(
       "super.onCreate();",
       `$&
-      OkHttpClientProvider.setOkHttpClientFactory(this);
-      AdGyde.init(this, "${props.adgydeKey}", "Organic");
-      AdGyde.setDebugEnabled(BuildConfig.DEBUG);`
+        OkHttpClientProvider.setOkHttpClientFactory(this);
+        AdGyde.init(this, "${props.adgydeKey}", "Organic");
+        AdGyde.setDebugEnabled(BuildConfig.DEBUG);`
     );
     config.modResults.contents = config.modResults.contents.replace(
       "SoLoader.init(this, /* native exopackage */ false);",
       `$&
-  
-      SoLoader.loadLibrary("bugsnag-ndk");
-      SoLoader.loadLibrary("bugsnag-plugin-android-anr");
-  
-      Bugsnag.start(this);`
+    
+        SoLoader.loadLibrary("bugsnag-ndk");
+        SoLoader.loadLibrary("bugsnag-plugin-android-anr");
+    
+        Bugsnag.start(this);`
     );
 
     return config;
@@ -77,7 +77,7 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
     config.modResults.contents = config.modResults.contents.replace(
       /classpath\('de.undercouch:gradle-download-task.*?$/m,
       `$&
-          classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`
+            classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`
     );
     return config;
   });
@@ -85,18 +85,18 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
     config.modResults.contents = config.modResults.contents.replace(
       /^apply from: .*react.gradle.*$/m,
       `$&
-  apply plugin: "com.bugsnag.android.gradle"
-  
-  bugsnag {
-      uploadReactNativeMappings = true
-  }`
+    apply plugin: "com.bugsnag.android.gradle"
+    
+    bugsnag {
+        uploadReactNativeMappings = true
+    }`
     );
     config.modResults.contents = config.modResults.contents.replace(
       /dependencies {/,
       `$&
-      implementation 'com.google.mlkit:barcode-scanning:17.0.2'
-      implementation 'com.facebook.android:facebook-core:12.0.1'
-      implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'`
+        implementation 'com.google.mlkit:barcode-scanning:17.0.2'
+        implementation 'com.facebook.android:facebook-core:12.0.1'
+        implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'`
     );
     return config;
   });

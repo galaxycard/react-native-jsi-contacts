@@ -55,5 +55,8 @@
   },
   "dependencies": {
     "@types/jest": "^29.2.5"
+  },
+  "jest": {
+    "preset": "expo-module-scripts"
   }
 }
