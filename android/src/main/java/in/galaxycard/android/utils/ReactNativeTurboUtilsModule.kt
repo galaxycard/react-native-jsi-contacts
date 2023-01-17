@@ -163,7 +163,6 @@ class ReactNativeTurboUtilsModule() : Module() {
                 val i = jws.lastIndexOf('.')
                 val untrusted = jwsBuilder.build()
                     .parseClaimsJwt(jws.substring(0, i + 1))
-
                 Arguments.makeNativeMap(untrusted.body)
             } else {
                 val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
