@@ -34,7 +34,7 @@ class ReactNativeTurboUtilsModule() : Module() {
 
         Constants {
             return@Constants DeviceUtils(appContext.reactContext!!).constants()
-          }
+        }
 
         Function("getDeviceData") {
             return@Function Arguments.makeNativeMap(DeviceUtils(appContext.reactContext!!).dynamicValues())
@@ -133,7 +133,8 @@ class ReactNativeTurboUtilsModule() : Module() {
                 if (packageManager.getLaunchIntentForPackage(applicationInfo.packageName) != null) {
                     val appDetails = HashMap<String, Any>()
                     appDetails[PACKAGE] = applicationInfo.packageName
-                    appDetails[DISPLAY_NAME] = packageManager.getApplicationLabel(applicationInfo).toString()
+                    appDetails[DISPLAY_NAME] =
+                        packageManager.getApplicationLabel(applicationInfo).toString()
                     appDetails[SYSTEM] = applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM !== 0
                     packageName = applicationInfo.packageName
                     concatenatedNames.append(packageName)
@@ -156,8 +157,8 @@ class ReactNativeTurboUtilsModule() : Module() {
             return@AsyncFunction Arguments.makeNativeMap(appsWithHash)
         }
 
-        Function("parseJwt"){jws: String, key: String? ->
-         val jwsBuilder = Jwts.parserBuilder()
+        Function("parseJwt") { jws: String, key: String? ->
+            val jwsBuilder = Jwts.parserBuilder()
 
             return@Function if (key == null) {
                 val i = jws.lastIndexOf('.')
@@ -221,104 +222,104 @@ class ReactNativeTurboUtilsModule() : Module() {
             contactsCursor.close()
         }
         return contactsList
-     }
+    }
 
     private fun getContactNumbers(context: Context): HashMap<String, ArrayList<String>> {
-         val contactsNumberMap = HashMap<String, ArrayList<String>>()
-         val cursor: Cursor? = context.contentResolver.query(
-             Phone.CONTENT_URI,
-             null,
-             null,
-             null,
-             Phone.NUMBER + " ASC"
-         )
-         if (cursor != null && cursor.count > 0) {
-             val contactIdIndex = cursor.getColumnIndex(Phone.CONTACT_ID)
-             val numberIndex = cursor.getColumnIndex(Phone.NUMBER)
-             while (cursor.moveToNext()) {
-                 val contactId = cursor.getString(contactIdIndex)
-                 val number: String = cursor.getString(numberIndex)
-                 //check if the map contains key or not, if not then create a new array list with number
-                 if (contactsNumberMap.containsKey(contactId)) {
-                     contactsNumberMap[contactId]?.add(number)
-                 } else {
-                     contactsNumberMap[contactId] = arrayListOf(number)
-                 }
-             }
-             //contact contains all the number of a particular contact
-             cursor.close()
-         }
-         return contactsNumberMap
-     }
+        val contactsNumberMap = HashMap<String, ArrayList<String>>()
+        val cursor: Cursor? = context.contentResolver.query(
+            Phone.CONTENT_URI,
+            null,
+            null,
+            null,
+            Phone.NUMBER + " ASC"
+        )
+        if (cursor != null && cursor.count > 0) {
+            val contactIdIndex = cursor.getColumnIndex(Phone.CONTACT_ID)
+            val numberIndex = cursor.getColumnIndex(Phone.NUMBER)
+            while (cursor.moveToNext()) {
+                val contactId = cursor.getString(contactIdIndex)
+                val number: String = cursor.getString(numberIndex)
+                //check if the map contains key or not, if not then create a new array list with number
+                if (contactsNumberMap.containsKey(contactId)) {
+                    contactsNumberMap[contactId]?.add(number)
+                } else {
+                    contactsNumberMap[contactId] = arrayListOf(number)
+                }
+            }
+            //contact contains all the number of a particular contact
+            cursor.close()
+        }
+        return contactsNumberMap
+    }
 
     private fun getContactEmails(context: Context): HashMap<String, ArrayList<String>> {
-         val contactsEmailMap = HashMap<String, ArrayList<String>>()
-         val cursor: Cursor? = context.contentResolver.query(
-             Email.CONTENT_URI,
-             null,
-             null,
-             null,
-             Email.ADDRESS + " ASC"
-         )
-         if (cursor != null && cursor.count > 0) {
-             val contactIdIndex = cursor.getColumnIndex(Email.CONTACT_ID)
-             val emailIndex = cursor.getColumnIndex(Email.ADDRESS)
- //            val photoIndex = cursor.getColumnIndex(Photo.PHOTO_URI)
-             while (cursor.moveToNext()) {
-                 val contactId = cursor.getString(contactIdIndex)
-                 val address: String = cursor.getString(emailIndex)
-                 //check if the map contains key or not, if not then create a new array list with number
-                 if (contactsEmailMap.containsKey(contactId)) {
-                     contactsEmailMap[contactId]?.add(address)
-                 } else {
-                     contactsEmailMap[contactId] = arrayListOf(address)
-                 }
-             }
-             //contact contains all the number of a particular contact
-             cursor.close()
-         }
-         return contactsEmailMap
-     }
+        val contactsEmailMap = HashMap<String, ArrayList<String>>()
+        val cursor: Cursor? = context.contentResolver.query(
+            Email.CONTENT_URI,
+            null,
+            null,
+            null,
+            Email.ADDRESS + " ASC"
+        )
+        if (cursor != null && cursor.count > 0) {
+            val contactIdIndex = cursor.getColumnIndex(Email.CONTACT_ID)
+            val emailIndex = cursor.getColumnIndex(Email.ADDRESS)
+            //            val photoIndex = cursor.getColumnIndex(Photo.PHOTO_URI)
+            while (cursor.moveToNext()) {
+                val contactId = cursor.getString(contactIdIndex)
+                val address: String = cursor.getString(emailIndex)
+                //check if the map contains key or not, if not then create a new array list with number
+                if (contactsEmailMap.containsKey(contactId)) {
+                    contactsEmailMap[contactId]?.add(address)
+                } else {
+                    contactsEmailMap[contactId] = arrayListOf(address)
+                }
+            }
+            //contact contains all the number of a particular contact
+            cursor.close()
+        }
+        return contactsEmailMap
+    }
 
     private fun installDataFromPackageManager(
-         packageManager: PackageManager,
-         packageName: String
-        ): HashMap<String, Any> {
-         // API level 9 and above have the "firstInstallTime" field.
-         // Check for it with reflection and return if present.
-         val data = HashMap<String, Any>()
-         try {
-             val info: PackageInfo = packageManager.getPackageInfo(packageName, 0)
-             var field: Field = PackageInfo::class.java.getField("firstInstallTime")
-             data[INSTALL] = field.getLong(info)
-             field = PackageInfo::class.java.getField("lastUpdateTime")
-             data[UPDATE] = field.getLong(info)
-             field = PackageInfo::class.java.getField("versionName")
-             data[VERSION_NAME] = field.get(info) as String
-         } catch (e: PackageManager.NameNotFoundException) {
-         } catch (e: IllegalAccessException) {
-         } catch (e: NoSuchFieldException) {
-         } catch (e: IllegalArgumentException) {
-         } catch (e: SecurityException) {
-         }
-         return data
-     }
+        packageManager: PackageManager,
+        packageName: String
+    ): HashMap<String, Any> {
+        // API level 9 and above have the "firstInstallTime" field.
+        // Check for it with reflection and return if present.
+        val data = HashMap<String, Any>()
+        try {
+            val info: PackageInfo = packageManager.getPackageInfo(packageName, 0)
+            var field: Field = PackageInfo::class.java.getField("firstInstallTime")
+            data[INSTALL] = field.getLong(info)
+            field = PackageInfo::class.java.getField("lastUpdateTime")
+            data[UPDATE] = field.getLong(info)
+            field = PackageInfo::class.java.getField("versionName")
+            data[VERSION_NAME] = field.get(info) as String
+        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: IllegalAccessException) {
+        } catch (e: NoSuchFieldException) {
+        } catch (e: IllegalArgumentException) {
+        } catch (e: SecurityException) {
+        }
+        return data
+    }
 
     private fun md5(s: String): String {
-         try {
-             val digest = MessageDigest.getInstance(HASH_ALGO)
-             digest.update(s.toByteArray())
-             val messageDigest = digest.digest()
-             val hexString = java.lang.StringBuilder()
-             for (b in messageDigest) {
-                 hexString.append(Integer.toHexString(0xFF and b.toInt()))
-             }
-             return hexString.toString()
-         } catch (e: NoSuchAlgorithmException) {
-             e.printStackTrace()
-         }
-         return ""
-     }
+        try {
+            val digest = MessageDigest.getInstance(HASH_ALGO)
+            digest.update(s.toByteArray())
+            val messageDigest = digest.digest()
+            val hexString = java.lang.StringBuilder()
+            for (b in messageDigest) {
+                hexString.append(Integer.toHexString(0xFF and b.toInt()))
+            }
+            return hexString.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        }
+        return ""
+    }
 
     companion object {
         const val NAME = "TurboUtils"
