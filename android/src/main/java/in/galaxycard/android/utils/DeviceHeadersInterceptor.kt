@@ -13,7 +13,7 @@ import java.math.BigDecimal
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
-class DeviceHeadersInterceptor(private val context: Context): Interceptor {
+class DeviceHeadersInterceptor(private val context: Context) : Interceptor {
     private var mSignatureHash: String? = null
 
     init {
@@ -22,7 +22,7 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
                 context.packageName,
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) PackageManager.GET_SIGNING_CERTIFICATES else PackageManager.GET_SIGNATURES
             )
-            for(signature in if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) packageInfo.signingInfo.apkContentsSigners else packageInfo.signatures) {
+            for (signature in if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) packageInfo.signingInfo.apkContentsSigners else packageInfo.signatures) {
                 try {
                     val md: MessageDigest = MessageDigest.getInstance("SHA")
                     md.update(signature.toByteArray())
@@ -58,7 +58,10 @@ class DeviceHeadersInterceptor(private val context: Context): Interceptor {
         headers.add("brand", constants["brand"]!! as String)
         headers.add("model", constants["model"]!! as String)
         headers.addUnsafeNonAscii("install-referrer", constants["installReferrer"]!! as String)
-        headers.addUnsafeNonAscii("x-gct-install-referrer", constants["installReferrer"]!! as String)
+        headers.addUnsafeNonAscii(
+            "x-gct-install-referrer",
+            constants["installReferrer"]!! as String
+        )
         headers.add("screen-width", constants["screenWidth"]!!.toString())
         headers.add("screen-height", constants["screenHeight"]!!.toString())
         headers.add("screen-density", constants["screenDensity"]!!.toString())
