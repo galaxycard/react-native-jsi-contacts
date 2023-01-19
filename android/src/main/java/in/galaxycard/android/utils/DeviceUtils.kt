@@ -37,7 +37,7 @@ class DeviceUtils(private val context: Context) {
     }
 
     init {
-        val sharedPreferences = context.getSharedPreferences(TurboStarterModule.NAME, Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences(ReactNativeTurboUtilsModule.NAME, Context.MODE_PRIVATE)
         getInstallReferrerFromGetApps(sharedPreferences)
     }
 
@@ -137,7 +137,7 @@ class DeviceUtils(private val context: Context) {
         }
         constants["screenDensity"] = context.resources.displayMetrics.density
         val sharedPref = context.getSharedPreferences(
-            TurboStarterModule.NAME,
+            ReactNativeTurboUtilsModule.NAME,
             Context.MODE_PRIVATE
         )
         constants["installReferrer"] = sharedPref.getString(INSTALL_REFERRER, Build.UNKNOWN)!!
