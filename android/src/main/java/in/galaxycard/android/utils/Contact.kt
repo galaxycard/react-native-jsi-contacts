@@ -1,6 +1,6 @@
 package `in`.galaxycard.android.utils
 
-data class Contact(val id: String, val name:String?) {
+data class Contact(val id: String, val name: String?) {
     var firstName: String? = null
     var middleName: String? = null
     var lastName: String? = null

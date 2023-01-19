@@ -1,0 +1,10 @@
+{
+  "name": "react-native-turbo-utils",
+  "platforms": ["ios", "android", "web"],
+  "ios": {
+    "modules": ["ReactNativeTurboUtilsModule"]
+  },
+  "android": {
+    "modules": ["in.galaxycard.android.utils.ReactNativeTurboUtilsModule"]
+  }
+}

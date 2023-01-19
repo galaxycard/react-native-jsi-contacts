@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "react-native-turbo-utils": ["../src/index"],
+      "react-native-turbo-utils/*": ["../src/*"]
+    }
+  }
+}
