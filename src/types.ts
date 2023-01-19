@@ -19,3 +19,22 @@ export type Contacts = {
   }[];
   hash: string;
 };
+
+export type DeviceInfoType = {
+  accessPointName: string;
+  airplaneMode: boolean;
+  batteryLevel: number;
+  batteryState: string;
+  carrier: string;
+  deviceName: string;
+  fontScale: number;
+  freeDiskStorage: number;
+  hasHeadphones: boolean;
+  hasLocation: boolean;
+  lowPowerMode: boolean;
+  maxMemory: number;
+  pinOrFingerprintSet: boolean;
+  totalDiskCapacity: number;
+  usedMemory: number;
+  wifiName: string;
+};
