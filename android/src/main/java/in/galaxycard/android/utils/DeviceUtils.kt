@@ -37,7 +37,8 @@ class DeviceUtils(private val context: Context) {
     }
 
     init {
-        val sharedPreferences = context.getSharedPreferences(TurboStarterModule.NAME, Context.MODE_PRIVATE)
+        val sharedPreferences =
+            context.getSharedPreferences(ReactNativeTurboUtilsModule.NAME, Context.MODE_PRIVATE)
         getInstallReferrerFromGetApps(sharedPreferences)
     }
 
@@ -50,7 +51,10 @@ class DeviceUtils(private val context: Context) {
                     when (state) {
                         OK -> {
                             val editor: SharedPreferences.Editor = sharedPreferences.edit()
-                            editor.putString(INSTALL_REFERRER, referrerClient.installReferrer.installReferrer)
+                            editor.putString(
+                                INSTALL_REFERRER,
+                                referrerClient.installReferrer.installReferrer
+                            )
                             editor.apply()
                             referrerClient.endConnection()
                         }
@@ -59,6 +63,7 @@ class DeviceUtils(private val context: Context) {
                         }
                     }
                 }
+
                 override fun onGetAppsServiceDisconnected() {
                     Log.d("GetApps", "disconnected")
                 }
@@ -75,7 +80,10 @@ class DeviceUtils(private val context: Context) {
                     val editor: SharedPreferences.Editor = sharedPreferences.edit()
                     when (responseCode) {
                         InstallReferrerClient.InstallReferrerResponse.OK -> {
-                            editor.putString(INSTALL_REFERRER, referrerClient.installReferrer.installReferrer)
+                            editor.putString(
+                                INSTALL_REFERRER,
+                                referrerClient.installReferrer.installReferrer
+                            )
                         }
                         else -> {
                             // Maybe set it to ""?
@@ -122,11 +130,13 @@ class DeviceUtils(private val context: Context) {
         constants["model"] = Build.MODEL
         constants["manufacturer"] = Build.MANUFACTURER
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val metrics: WindowMetrics = context.getSystemService(WindowManager::class.java).currentWindowMetrics
+            val metrics: WindowMetrics =
+                context.getSystemService(WindowManager::class.java).currentWindowMetrics
             constants["screenWidth"] = metrics.bounds.width()
             constants["screenHeight"] = metrics.bounds.height()
         } else {
-            val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+            val display =
+                (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
             val metrics = if (display != null) {
                 DisplayMetrics().also { display.getRealMetrics(it) }
             } else {
@@ -137,7 +147,7 @@ class DeviceUtils(private val context: Context) {
         }
         constants["screenDensity"] = context.resources.displayMetrics.density
         val sharedPref = context.getSharedPreferences(
-            TurboStarterModule.NAME,
+            ReactNativeTurboUtilsModule.NAME,
             Context.MODE_PRIVATE
         )
         constants["installReferrer"] = sharedPref.getString(INSTALL_REFERRER, Build.UNKNOWN)!!
@@ -150,7 +160,8 @@ class DeviceUtils(private val context: Context) {
             context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val deviceData = HashMap<String, Any>()
 
-        deviceData["hasHeadphones"] = audioManager.isWiredHeadsetOn || audioManager.isBluetoothA2dpOn
+        deviceData["hasHeadphones"] =
+            audioManager.isWiredHeadsetOn || audioManager.isBluetoothA2dpOn
 
         val telMgr =
             context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -183,9 +194,11 @@ class DeviceUtils(private val context: Context) {
             val rootDir = StatFs(Environment.getRootDirectory().absolutePath)
             val dataDir = StatFs(Environment.getDataDirectory().absolutePath)
             val rootFree: Double =
-                BigInteger.valueOf(rootDir.availableBlocksLong).multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
+                BigInteger.valueOf(rootDir.availableBlocksLong)
+                    .multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
             val dataFree: Double =
-                BigInteger.valueOf(dataDir.availableBlocksLong).multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
+                BigInteger.valueOf(dataDir.availableBlocksLong)
+                    .multiply(BigInteger.valueOf(rootDir.blockSizeLong)).toDouble()
             deviceData["freeDiskStorage"] = (rootFree + dataFree).toBigDecimal()
         } catch (e: java.lang.Exception) {
             deviceData["freeDiskStorage"] = -1
@@ -196,10 +209,13 @@ class DeviceUtils(private val context: Context) {
             val dataDir = StatFs(Environment.getDataDirectory().absolutePath)
 
             val rootDirCapacity: BigInteger = BigInteger.valueOf(rootDir.blockCountLong).multiply(
-                BigInteger.valueOf(rootDir.blockSizeLong))
+                BigInteger.valueOf(rootDir.blockSizeLong)
+            )
             val dataDirCapacity: BigInteger = BigInteger.valueOf(dataDir.blockCountLong).multiply(
-                BigInteger.valueOf(dataDir.blockSizeLong))
-            deviceData["totalDiskCapacity"] = rootDirCapacity.add(dataDirCapacity).toDouble().toBigDecimal()
+                BigInteger.valueOf(dataDir.blockSizeLong)
+            )
+            deviceData["totalDiskCapacity"] =
+                rootDirCapacity.add(dataDirCapacity).toDouble().toBigDecimal()
         } catch (e: java.lang.Exception) {
             deviceData["totalDiskCapacity"] = -1
         }
@@ -219,7 +235,8 @@ class DeviceUtils(private val context: Context) {
         }
 
         var hasLocation = false
-        val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager: LocationManager =
+            context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         hasLocation =
             hasLocation or locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -228,7 +245,8 @@ class DeviceUtils(private val context: Context) {
 
         deviceData["hasLocation"] = hasLocation
 
-        val info = (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
+        val info =
+            (context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager).connectionInfo
         deviceData["wifiName"] = Build.UNKNOWN
         if (info != null && info.ssid !== null) {
             deviceData["wifiName"] = info.ssid
@@ -243,7 +261,7 @@ class DeviceUtils(private val context: Context) {
             val bluetoothName =
                 getString(context.contentResolver, "bluetooth_name")
             if (bluetoothName != null) {
-                deviceData["deviceName"] =  bluetoothName
+                deviceData["deviceName"] = bluetoothName
             }
             if (Build.VERSION.SDK_INT >= 25) {
                 val deviceName = Settings.Global.getString(

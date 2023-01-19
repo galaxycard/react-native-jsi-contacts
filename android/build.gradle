@@ -1,116 +1,143 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
+
+group = 'in.galaxycard.android.utils'
+version = '0.1.0'
+
 buildscript {
-    if (project == rootProject) {
-        repositories {
-            google()
-            mavenCentral()
-        }
+  def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+  if (expoModulesCorePlugin.exists()) {
+    apply from: expoModulesCorePlugin
+    applyKotlinExpoModulesCorePlugin()
+  }
 
-        dependencies {
-            classpath 'com.android.tools.build:gradle:7.0.4'
-            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-            implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-        }
+  // Simple helper that allows the root project to override versions declared by this library.
+  ext.safeExtGet = { prop, fallback ->
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+  }
+
+  // Ensures backward compatibility
+  ext.getKotlinVersion = {
+    if (ext.has("kotlinVersion")) {
+      ext.kotlinVersion()
     } else {
-        repositories {
-            google()
-            mavenCentral()
-        }
-
-        dependencies {
-            classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:+'
-        }
+      ext.safeExtGet("kotlinVersion", "1.6.10")
     }
+  }
+
+  repositories {
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${getKotlinVersion()}")
+  }
 }
 
 def isNewArchitectureEnabled() {
     return project.hasProperty('newArchEnabled') && project.newArchEnabled == 'true'
 }
 
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+// Creating sources with comments
+task androidSourcesJar(type: Jar) {
+  classifier = 'sources'
+  from android.sourceSets.main.java.srcDirs
 }
 
-apply plugin: 'com.facebook.react'
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+afterEvaluate {
+  publishing {
+    publications {
+      release(MavenPublication) {
+        from components.release
+        // Add additional sourcesJar to artifacts
+        artifact(androidSourcesJar)
+      }
+    }
+    repositories {
+      maven {
+        url = mavenLocal().url
+      }
+    }
+  }
+}
 
 android {
-    compileSdkVersion safeExtGet('TurboStarter_compileSdkVersion', 31)
-    defaultConfig {
-        minSdkVersion safeExtGet('TurboStarter_minSdkVersion', 21)
-        targetSdkVersion safeExtGet('TurboStarter_targetSdkVersion', 31)
-        versionCode 1
-        versionName '1.0'
+  compileSdkVersion safeExtGet("compileSdkVersion", 31)
 
-        consumerProguardFiles 'proguard-rules.pro'
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
 
-        externalNativeBuild {
-            cmake {
-                cFlags '-Wall', '-Werror', '-fexceptions', '-frtti', '-DWITH_INSPECTOR=1'
-                arguments '-DCMAKE_VERBOSE_MAKEFILE=1'
-                cppFlags '-std=c++17'
-            }
-        }
-    }
+  kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_11.majorVersion
+  }
+
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", 21)
+    targetSdkVersion safeExtGet("targetSdkVersion", 31)
+    versionCode 1
+    versionName "0.1.0"
+
+    consumerProguardFiles 'proguard-rules.pro'
 
     externalNativeBuild {
         cmake {
+            cFlags '-Wall', '-Werror', '-fexceptions', '-frtti', '-DWITH_INSPECTOR=1'
+            arguments '-DCMAKE_VERBOSE_MAKEFILE=1'
+            cppFlags '-std=c++17'
+        }
+    }
+  }
+
+  externalNativeBuild {
+        cmake {
             path 'CMakeLists.txt'
-            // pin cmake version to support M1 machines
-            version '3.22.1'
+        }
+  }
+
+  lintOptions {
+    abortOnError false
+  }
+
+  sourceSets.main {
+    java {
+        if (!isNewArchitectureEnabled()) {
+            srcDirs += [
+                'build/generated/source/codegen/java'
+            ]
         }
     }
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-    }
-
-    lintOptions {
-        disable 'GradleCompatible'
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    sourceSets.main {
-        java {
-            if (!isNewArchitectureEnabled()) {
-                srcDirs += [
-                    'build/generated/source/codegen/java'
-                ]
-            }
-        }
-    }
-
-    buildFeatures {
-        viewBinding true
-    }
+  buildFeatures {
+    viewBinding true
+  }
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        url("$rootDir/../node_modules/react-native/android")
-    }
-    google()
-    mavenCentral()
+  maven {
+      // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+      url("$rootDir/../node_modules/react-native/android")
+  }
+  mavenCentral()
 }
 
 dependencies {
-    implementation project(':ReactAndroid')
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-    implementation 'com.android.installreferrer:installreferrer:2.2'
-    implementation 'com.miui.referrer:homereferrer:1.0.0.6'
-    api 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
-        exclude group: 'org.json', module: 'json' //provided by Android natively
-    }
+  implementation project(':expo-modules-core')
+  implementation "com.facebook.react:react-native:+"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
+  implementation 'com.squareup.okhttp3:okhttp:4.1.0'
+  implementation 'com.android.installreferrer:installreferrer:2.2'
+  implementation 'com.miui.referrer:homereferrer:1.0.0.6'
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+  api 'io.jsonwebtoken:jjwt-api:0.11.5'
+  runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+  runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
+      exclude group: 'org.json', module: 'json' //provided by Android natively
+  }
 }
 
 if (isNewArchitectureEnabled()) {
