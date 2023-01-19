@@ -1,22 +1,11 @@
 import ReactNativeTurboUtilsModule from "./ReactNativeTurboUtilsModule";
 import { Contacts, InstalledApps } from "./types";
 
-export function getDeviceData() {
-  return ReactNativeTurboUtilsModule.getDeviceData();
-}
+export { Contacts, InstalledApps };
 
-export function getConstants() {
-  return ReactNativeTurboUtilsModule.getConstants();
-}
+const { getDeviceData, getInstalledApps, getContacts, parseJwt, ...constants } =
+  ReactNativeTurboUtilsModule;
 
-export async function getInstalledApps(): Promise<InstalledApps> {
-  return await ReactNativeTurboUtilsModule.getInstalledApps();
-}
+export { getDeviceData, getInstalledApps, getContacts, parseJwt };
 
-export async function getContacts(): Promise<Contacts> {
-  return ReactNativeTurboUtilsModule.getContacts();
-}
-
-export function parseJwt(jwt: string, key: string | null) {
-  return ReactNativeTurboUtilsModule.parseJwt(jwt, key);
-}
+export default constants;

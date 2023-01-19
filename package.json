@@ -1,5 +1,5 @@
 {
-  "name": "react-native-turbo-utils",
+  "name": "@galaxycard/react-native-turbo-utils",
   "version": "0.1.0",
   "description": "TurboModule",
   "main": "build/index.js",

@@ -32,9 +32,9 @@ class ReactNativeTurboUtilsModule() : Module() {
     override fun definition(): ModuleDefinitionData = ModuleDefinition {
         Name("ReactNativeTurboUtils")
 
-        Function("getConstants") {
-            return@Function DeviceUtils(appContext.reactContext!!).constants()
-        }
+        Constants {
+            return@Constants DeviceUtils(appContext.reactContext!!).constants()
+          }
 
         Function("getDeviceData") {
             return@Function Arguments.makeNativeMap(DeviceUtils(appContext.reactContext!!).dynamicValues())
