@@ -28,16 +28,19 @@ import java.security.NoSuchAlgorithmException
 import android.Manifest.permission
 import android.net.Uri
 
+const val DEVICE_INFO_CHANGED_EVENT_NAME = "onDeviceInfoChanged"
+
 class ReactNativeTurboUtilsModule() : Module() {
+    private lateinit var deviceUtilsInstance: DeviceUtils
     override fun definition(): ModuleDefinitionData = ModuleDefinition {
         Name("ReactNativeTurboUtils")
 
         Constants {
-            return@Constants DeviceUtils(appContext.reactContext!!).constants()
+            return@Constants deviceUtilsInstance.constants()
         }
 
         Function("getDeviceData") {
-            return@Function Arguments.makeNativeMap(DeviceUtils(appContext.reactContext!!).dynamicValues())
+            return@Function Arguments.makeNativeMap(deviceUtilsInstance.dynamicValues())
         }
 
         AsyncFunction("getContacts") {
@@ -177,28 +180,40 @@ class ReactNativeTurboUtilsModule() : Module() {
             }
         }
 
-        OnCreate {
-            DeviceUtils(appContext.reactContext!!)
+        Events(DEVICE_INFO_CHANGED_EVENT_NAME)
+
+        OnStartObserving {
             val filter = IntentFilter()
             filter.addAction(Intent.ACTION_POWER_CONNECTED)
             filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
             filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             filter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
             filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION)
+            filter.addAction(Intent.ACTION_BATTERY_CHANGED)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 filter.addAction(CarrierConfigManager.ACTION_CARRIER_CONFIG_CHANGED)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 filter.addAction(TelephonyManager.ACTION_SUBSCRIPTION_CARRIER_IDENTITY_CHANGED)
             }
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    this@ReactNativeTurboUtilsModule.sendEvent(
-                        "RNDeviceInfo_deviceDataChanged",
-                    )
-                }
-            }
             appContext.reactContext!!.registerReceiver(receiver, filter)
+        }
+
+        OnStopObserving {
+            appContext.reactContext!!.unregisterReceiver(receiver)
+        }
+
+        OnCreate {
+            deviceUtilsInstance = DeviceUtils(appContext.reactContext!!)
+        }
+    }
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            this@ReactNativeTurboUtilsModule.sendEvent(
+                DEVICE_INFO_CHANGED_EVENT_NAME, 
+                deviceUtilsInstance.dynamicValues()
+            )
         }
     }
 
