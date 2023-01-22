@@ -26,7 +26,10 @@ import java.lang.reflect.Field
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import android.Manifest.permission
+import android.graphics.Color
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 
 const val DEVICE_INFO_CHANGED_EVENT_NAME = "onDeviceInfoChanged"
 
@@ -41,6 +44,16 @@ class ReactNativeTurboUtilsModule() : Module() {
 
         Function("getDeviceData") {
             return@Function Arguments.makeNativeMap(deviceUtilsInstance.dynamicValues())
+        }
+
+        Function("launchUrlInCCT") { url: String, color: String ->
+            val customTabsIntentBuilder  = CustomTabsIntent.Builder();
+            val colorInt = Color.parseColor(color ?: "#0079f3");
+            val defaultColors = CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(colorInt)
+                .build();
+            customTabsIntentBuilder.setDefaultColorSchemeParams(defaultColors);
+            customTabsIntentBuilder.build().launchUrl(appContext.reactContext!!, Uri.parse(url));
         }
 
         AsyncFunction("getContacts") {
