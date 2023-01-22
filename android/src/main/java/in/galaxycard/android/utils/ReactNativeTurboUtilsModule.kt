@@ -46,14 +46,14 @@ class ReactNativeTurboUtilsModule() : Module() {
             return@Function Arguments.makeNativeMap(deviceUtilsInstance.dynamicValues())
         }
 
-        Function("launchUrlInCCT") { url: String, color: String ->
+        Function("launchUrlInCCT") { url: String, color: String? ->
             val customTabsIntentBuilder  = CustomTabsIntent.Builder();
             val colorInt = Color.parseColor(color ?: "#0079f3");
             val defaultColors = CustomTabColorSchemeParams.Builder()
                 .setToolbarColor(colorInt)
                 .build();
             customTabsIntentBuilder.setDefaultColorSchemeParams(defaultColors);
-            customTabsIntentBuilder.build().launchUrl(appContext.reactContext!!, Uri.parse(url));
+            customTabsIntentBuilder.build().launchUrl(appContext.activityProvider!!.currentActivity, Uri.parse(url));
         }
 
         AsyncFunction("getContacts") {
