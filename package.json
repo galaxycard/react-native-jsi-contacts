@@ -18,13 +18,23 @@
     "release": "release-it",
     "prettier": "prettier -c .prettierignore ."
   },
+  "files": [
+    "/android",
+    "!/android/build",
+    "!/android/.cxx",
+    "/ios",
+    "/build",
+    "/src",
+    "/plugin/build",
+    "/*.podspec"
+  ],
   "keywords": [
     "react-native",
     "expo",
     "react-native-turbo-utils",
     "ReactNativeTurboUtils"
   ],
-  "repository": "https://github.com/galaxycard/react-native-turbo-utils",
+  "repository": "git@github.com:galaxycard/react-native-turbo-utils.git",
   "bugs": {
     "url": "https://github.com/galaxycard/react-native-turbo-utils/issues"
   },
@@ -62,5 +72,10 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "release-it": {
+    "git": {
+      "pushRepo": "git@github.com:galaxycard/react-native-turbo-utils.git"
+    }
   }
 }
