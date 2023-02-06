@@ -2,9 +2,9 @@ import { EventEmitter, Subscription } from "expo-modules-core";
 import { ColorValue } from "react-native/types";
 
 import ReactNativeTurboUtilsModule from "./ReactNativeTurboUtilsModule";
-import { Contacts, DeviceInfoType, InstalledApps } from "./types";
+import { Contact, DeviceInfoType, InstalledApps, ModuleType } from "./types";
 
-export { Contacts, InstalledApps, DeviceInfoType };
+export { Contact, InstalledApps, DeviceInfoType };
 export {
   getDeviceData,
   getInstalledApps,
@@ -20,13 +20,12 @@ const {
   parseJwt,
   launchUrlInCCT: launchCCTWithColor,
   ...constants
-} = ReactNativeTurboUtilsModule;
+}: ModuleType = ReactNativeTurboUtilsModule;
 
 const launchUrlInCCT = (url: string, color?: ColorValue) =>
   launchCCTWithColor(url, color?.toString());
 
-const DeviceModule = ReactNativeTurboUtilsModule;
-const emitter = new EventEmitter(DeviceModule);
+const emitter = new EventEmitter(ReactNativeTurboUtilsModule);
 
 export function addDeviceInfoChangedListener(
   listener: (event: DeviceInfoType) => void

@@ -79,10 +79,7 @@ class ReactNativeTurboUtilsModule() : Module() {
 
                 val contactsArray = ArrayList<HashMap<String, Any?>>()
 
-                val digest: MessageDigest = MessageDigest.getInstance("MD5")
-
                 contacts.forEach { contact ->
-                    digest.update(contact.id.toByteArray())
                     val map = HashMap<String, Any?>()
                     map["id"] = contact.id
                     map["name"] = contact.name
@@ -122,19 +119,7 @@ class ReactNativeTurboUtilsModule() : Module() {
                     contactsArray.add(map)
                 }
 
-                val messageDigest: ByteArray = digest.digest()
-                val hexString = StringBuilder()
-                for (byte in messageDigest) {
-                    val hex = StringBuilder(Integer.toHexString(0xFF and byte.toInt()))
-                    while (hex.length < 2) hex.insert(0, "0")
-                    hexString.append(hex)
-                }
-
-                val map = HashMap<String, Any>()
-                map["contacts"] = contactsArray
-                map["hash"] = hexString.toString()
-
-                return@runBlocking Arguments.makeNativeMap(map)
+                return@runBlocking Arguments.makeNativeArray(contactsArray)
             }
         }
 

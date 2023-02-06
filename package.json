@@ -16,7 +16,7 @@
     "open:android": "open -a \"Android Studio\" example/android",
     "typescript": "tsc --noEmit",
     "release": "release-it",
-    "prettier": "prettier -c .prettierignore ."
+    "prettier": "prettier ."
   },
   "keywords": [
     "react-native",
@@ -36,10 +36,10 @@
     "@commitlint/config-conventional": "^17.4.2",
     "@react-native-community/eslint-config": "^3.2.0",
     "@release-it/conventional-changelog": "^5.1.1",
-    "@types/jest": "^29.2.6",
+    "@types/jest": "^29.4.0",
     "@types/react": "^18.0.27",
-    "@types/react-native": "^0.71.0",
-    "eslint": "^8.32.0",
+    "@types/react-native": "^0.71.2",
+    "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "expo-module-scripts": "^3.0.4",
@@ -48,7 +48,7 @@
     "pod-install": "^0.1.38",
     "prettier": "^2.8.3",
     "release-it": "^15.6.0",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "peerDependencies": {
     "expo": "*",

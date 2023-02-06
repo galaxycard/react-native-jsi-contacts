@@ -44,11 +44,12 @@ class DeviceHeadersInterceptor(private val context: Context) : Interceptor {
         val headers = Headers.Builder()
         headers.addAll(chain.request().headers)
         if (mSignatureHash != null) {
-            headers.add("x-gct-signature", mSignatureHash!!)
+            headers.add("signature", mSignatureHash!!)
         }
         val constants = DeviceUtils(context).constants()
         if (chain.request().header("device") == null) {
             headers.add("device", constants["uniqueId"]!! as String)
+            headers.add("device-id", constants["uniqueId"]!! as String)
         }
         headers.add("build", constants["buildNumber"]!! as String)
         headers.add("build-number", constants["buildNumber"]!! as String)

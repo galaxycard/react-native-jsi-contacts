@@ -9,15 +9,12 @@ export type InstalledApps = {
   hash: string;
 };
 
-export type Contacts = {
-  contacts: {
-    id: number;
-    name?: string;
-    phones?: string[];
-    emails?: string[];
-    photo?: string;
-  }[];
-  hash: string;
+export type Contact = {
+  id: number;
+  name?: string;
+  phones?: string[];
+  emails?: string[];
+  photo?: string;
 };
 
 export type DeviceInfoType = {
@@ -37,4 +34,29 @@ export type DeviceInfoType = {
   totalDiskCapacity: number;
   usedMemory: number;
   wifiName: string;
+};
+
+export type ConstantType = {
+  uniqueId: string;
+  deviceId: string;
+  bundleId: string;
+  systemVersion: string;
+  appVersion: string;
+  buildNumber: string;
+  appName: string;
+  brand: string;
+  model: string;
+  manufacturer: string;
+  screenWidth: number;
+  screenHeight: number;
+  screenDensity: number;
+  installReferrer: string;
+};
+
+export type ModuleType = ConstantType & {
+  getDeviceData: () => DeviceInfoType;
+  getInstalledApps: () => InstalledApps;
+  getContacts: () => Contact[];
+  parseJwt: () => { [key: string]: any };
+  launchUrlInCCT: (url: string, color?: string) => void;
 };
