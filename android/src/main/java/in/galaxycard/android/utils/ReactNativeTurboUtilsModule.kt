@@ -85,15 +85,9 @@ class ReactNativeTurboUtilsModule() : Module() {
                     map["name"] = contact.name
                     contactNumbers[contact.id]?.let { numbers ->
                         map["phones"] = numbers
-                        numbers.forEach {
-                            digest.update(it.toByteArray())
-                        }
                     }
                     contactEmails[contact.id]?.let { emails ->
                         map["emails"] = emails
-                        emails.forEach {
-                            digest.update(it.toByteArray())
-                        }
                     }
                     val inputStream: InputStream? =
                         ContactsContract.Contacts.openContactPhotoInputStream(
