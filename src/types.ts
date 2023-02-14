@@ -57,6 +57,6 @@ export type ModuleType = ConstantType & {
   getDeviceData: () => DeviceInfoType;
   getInstalledApps: () => InstalledApps;
   getContacts: () => Contact[];
-  parseJwt: () => { [key: string]: any };
+  parseJwt: (authToken: string, key: string | null) => { [key: string]: any };
   launchUrlInCCT: (url: string, color?: string) => void;
 };

@@ -1,5 +1,6 @@
 import { EventEmitter, Subscription } from "expo-modules-core";
-import { ColorValue } from "react-native/types";
+import { ColorValue } from "react-native";
+
 
 import ReactNativeTurboUtilsModule from "./ReactNativeTurboUtilsModule";
 import { Contact, DeviceInfoType, InstalledApps, ModuleType } from "./types";
