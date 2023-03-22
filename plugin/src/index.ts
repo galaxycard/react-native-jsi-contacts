@@ -10,10 +10,6 @@ import {
   withProjectBuildGradle,
 } from "@expo/config-plugins";
 
-interface AdGydeProps {
-  adgydeKey: string;
-}
-
 interface BugsnagProps {
   bugsnagKey: string;
 }
@@ -22,7 +18,7 @@ interface FacebookProps {
   facebookAppId: string;
 }
 
-interface Props extends AdGydeProps, BugsnagProps, FacebookProps {}
+interface Props extends BugsnagProps, FacebookProps {}
 
 const { addMetaDataItemToMainApplication, getMainApplicationOrThrow } =
   AndroidConfig.Manifest;
@@ -40,7 +36,6 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
     import com.facebook.react.modules.network.OkHttpClientProvider;
     import okhttp3.OkHttpClient;
     import com.bugsnag.android.Bugsnag;
-    import com.adgyde.android.AdGyde;
 
     public class MainApplication$1, OkHttpClientFactory {
       @Override
@@ -55,9 +50,7 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
     config.modResults.contents = config.modResults.contents.replace(
       "super.onCreate();",
       `$&
-        OkHttpClientProvider.setOkHttpClientFactory(this);
-        AdGyde.init(this, "${props.adgydeKey}", "Organic");
-        AdGyde.setDebugEnabled(BuildConfig.DEBUG);`
+        OkHttpClientProvider.setOkHttpClientFactory(this);`
     );
     config.modResults.contents = config.modResults.contents.replace(
       "SoLoader.init(this, /* native exopackage */ false);",
@@ -95,8 +88,7 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
       /dependencies {/,
       `$&
         implementation 'com.google.mlkit:barcode-scanning:17.0.2'
-        implementation 'com.facebook.android:facebook-core:12.0.1'
-        implementation 'com.adgyde:adgyde-androidx-sdk:4.1.12'`
+        implementation 'com.facebook.android:facebook-core:12.0.1'`
     );
     return config;
   });
