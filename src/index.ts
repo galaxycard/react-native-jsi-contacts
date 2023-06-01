@@ -1,17 +1,9 @@
 import { EventEmitter, Subscription } from "expo-modules-core";
 
 import ReactNativeTurboUtilsModule from "./ReactNativeTurboUtilsModule";
-import { Contact, DeviceInfoType, InstalledApps, ModuleType } from "./types";
+import { Contact, DeviceInfoType, InstalledApps } from "./types";
 
 export { Contact, InstalledApps, DeviceInfoType };
-export { getDeviceData, getInstalledApps, getContacts };
-
-const {
-  getDeviceData,
-  getInstalledApps,
-  getContacts,
-  ...constants
-}: ModuleType = ReactNativeTurboUtilsModule;
 
 const emitter = new EventEmitter(ReactNativeTurboUtilsModule);
 
@@ -21,4 +13,4 @@ export function addDeviceInfoChangedListener(
   return emitter.addListener("onDeviceInfoChanged", listener);
 }
 
-export default constants;
+export default ReactNativeTurboUtilsModule;
