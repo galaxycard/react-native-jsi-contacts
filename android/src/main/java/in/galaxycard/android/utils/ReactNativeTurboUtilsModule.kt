@@ -19,7 +19,6 @@ import com.facebook.react.bridge.Arguments
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.modules.ModuleDefinitionData
-import io.jsonwebtoken.Jwts
 import kotlinx.coroutines.*
 import java.io.InputStream
 import java.lang.reflect.Field
@@ -28,8 +27,6 @@ import java.security.NoSuchAlgorithmException
 import android.Manifest.permission
 import android.graphics.Color
 import android.net.Uri
-import androidx.browser.customtabs.CustomTabColorSchemeParams
-import androidx.browser.customtabs.CustomTabsIntent
 
 const val DEVICE_INFO_CHANGED_EVENT_NAME = "onDeviceInfoChanged"
 
@@ -44,16 +41,6 @@ class ReactNativeTurboUtilsModule() : Module() {
 
         Function("getDeviceData") {
             return@Function Arguments.makeNativeMap(deviceUtilsInstance.dynamicValues())
-        }
-
-        Function("launchUrlInCCT") { url: String, color: String? ->
-            val customTabsIntentBuilder  = CustomTabsIntent.Builder();
-            val colorInt = Color.parseColor(color ?: "#0079f3");
-            val defaultColors = CustomTabColorSchemeParams.Builder()
-                .setToolbarColor(colorInt)
-                .build();
-            customTabsIntentBuilder.setDefaultColorSchemeParams(defaultColors);
-            customTabsIntentBuilder.build().launchUrl(appContext.activityProvider!!.currentActivity, Uri.parse(url));
         }
 
         AsyncFunction("getContacts") {
@@ -150,26 +137,6 @@ class ReactNativeTurboUtilsModule() : Module() {
             appsWithHash[APPS] = appsList
             appsWithHash[HASH] = hash
             return@AsyncFunction Arguments.makeNativeMap(appsWithHash)
-        }
-
-        Function("parseJwt") { jws: String, key: String? ->
-            val jwsBuilder = Jwts.parserBuilder()
-
-            return@Function if (key == null) {
-                val i = jws.lastIndexOf('.')
-                val untrusted = jwsBuilder.build()
-                    .parseClaimsJwt(jws.substring(0, i + 1))
-                Arguments.makeNativeMap(untrusted.body)
-            } else {
-                val signingKeyResolver = GalaxyCardSigningKeyResolver(key.toByteArray())
-
-                val trusted = jwsBuilder
-                    .setSigningKeyResolver(signingKeyResolver)
-                    .build()
-                    .parseClaimsJws(jws)
-
-                Arguments.makeNativeMap(trusted.body)
-            }
         }
 
         Events(DEVICE_INFO_CHANGED_EVENT_NAME)
