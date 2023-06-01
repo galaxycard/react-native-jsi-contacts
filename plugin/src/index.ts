@@ -68,7 +68,7 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
 const withBugsnagGradle: ConfigPlugin = (config) => {
   config = withProjectBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
-      /classpath\('de.undercouch:gradle-download-task.*?$/m,
+      /classpath\('com.facebook.react:react-native-gradle-plugin'\)$/m,
       `$&
             classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`
     );
@@ -76,13 +76,13 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
   });
   return withAppBuildGradle(config, async (config) => {
     config.modResults.contents = config.modResults.contents.replace(
-      /^apply from: .*react.gradle.*$/m,
-      `$&
-    apply plugin: "com.bugsnag.android.gradle"
+      /^android \{$/m,
+      `apply plugin: "com.bugsnag.android.gradle"
 
     bugsnag {
         uploadReactNativeMappings = true
-    }`
+    }
+    $&`
     );
     config.modResults.contents = config.modResults.contents.replace(
       /dependencies {/,

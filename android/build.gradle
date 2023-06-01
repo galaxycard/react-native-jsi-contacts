@@ -133,13 +133,6 @@ dependencies {
   implementation 'com.miui.referrer:homereferrer:1.0.0.6'
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-  api 'io.jsonwebtoken:jjwt-api:0.11.5'
-  runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-  runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.11.5') {
-      exclude group: 'org.json', module: 'json' //provided by Android natively
-  }
-  implementation 'androidx.browser:browser:1.4.0'
-  implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 }
 
 if (isNewArchitectureEnabled()) {
