@@ -1,6 +1,6 @@
 {
   "name": "@galaxycard/react-native-turbo-utils",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "TurboModule",
   "main": "build/index.js",
   "types": "build/index.d.ts",
