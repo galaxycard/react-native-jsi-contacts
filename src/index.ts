@@ -1,4 +1,7 @@
+import ReactNativeTurboUtilsModule from "./ReactNativeTurboUtilsModule";
+import addDeviceInfoChangedListener from "./load-module";
 import { Contact, DeviceInfoType, InstalledApps } from "./types";
-import * as ReactNativeTurboUtilsModule from "./load-module";
 
-export { Contact, InstalledApps, DeviceInfoType, ReactNativeTurboUtilsModule };
+export { Contact, InstalledApps, DeviceInfoType, addDeviceInfoChangedListener };
+
+export default ReactNativeTurboUtilsModule;
