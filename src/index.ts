@@ -1,4 +1,6 @@
 import { Contact, DeviceInfoType, InstalledApps } from "./types";
-import * as ReactNativeTurboUtilsModule from "./load-module";
 
-export { Contact, InstalledApps, DeviceInfoType, ReactNativeTurboUtilsModule };
+export * from "./load-module";
+export { default } from "./load-module";
+
+export { Contact, DeviceInfoType, InstalledApps };
