@@ -39,19 +39,11 @@ def isNewArchitectureEnabled() {
     return project.hasProperty('newArchEnabled') && project.newArchEnabled == 'true'
 }
 
-// Creating sources with comments
-task androidSourcesJar(type: Jar) {
-  classifier = 'sources'
-  from android.sourceSets.main.java.srcDirs
-}
-
 afterEvaluate {
   publishing {
     publications {
       release(MavenPublication) {
         from components.release
-        // Add additional sourcesJar to artifacts
-        artifact(androidSourcesJar)
       }
     }
     repositories {
@@ -63,6 +55,7 @@ afterEvaluate {
 }
 
 android {
+  namespace = "in.galaxycard.android.utils"
   compileSdkVersion safeExtGet("compileSdkVersion", 31)
 
   compileOptions {
@@ -99,6 +92,12 @@ android {
 
   lintOptions {
     abortOnError false
+  }
+  
+  publishing {
+    singleVariant("release") {
+      withSourcesJar()
+    }
   }
 
   sourceSets.main {
