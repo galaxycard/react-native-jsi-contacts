@@ -80,7 +80,7 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
       `apply plugin: "com.bugsnag.android.gradle"
 
     bugsnag {
-        uploadReactNativeMappings = true
+        uploadReactNativeMappings = false
     }
     $&`
     );
