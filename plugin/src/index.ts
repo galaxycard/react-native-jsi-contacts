@@ -45,12 +45,12 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
           .addNetworkInterceptor(new DeviceHeadersInterceptor(this));
         return builder.build();
       }
-      `
+      `,
     );
     config.modResults.contents = config.modResults.contents.replace(
       "super.onCreate();",
       `$&
-        OkHttpClientProvider.setOkHttpClientFactory(this);`
+        OkHttpClientProvider.setOkHttpClientFactory(this);`,
     );
     config.modResults.contents = config.modResults.contents.replace(
       "SoLoader.init(this, /* native exopackage */ false);",
@@ -59,7 +59,7 @@ const withApplicationChanges: ConfigPlugin<Props> = (config, props: Props) => {
         SoLoader.loadLibrary("bugsnag-ndk");
         SoLoader.loadLibrary("bugsnag-plugin-android-anr");
 
-        Bugsnag.start(this);`
+        Bugsnag.start(this);`,
     );
 
     return config;
@@ -70,7 +70,7 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
     config.modResults.contents = config.modResults.contents.replace(
       /classpath\('com.facebook.react:react-native-gradle-plugin'\)$/m,
       `$&
-            classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`
+            classpath("com.bugsnag:bugsnag-android-gradle-plugin:7.+")`,
     );
     return config;
   });
@@ -80,15 +80,14 @@ const withBugsnagGradle: ConfigPlugin = (config) => {
       `apply plugin: "com.bugsnag.android.gradle"
 
     bugsnag {
-        uploadReactNativeMappings = true
+        uploadReactNativeMappings = false
     }
-    $&`
+    $&`,
     );
     config.modResults.contents = config.modResults.contents.replace(
       /dependencies {/,
       `$&
-        implementation 'com.google.mlkit:barcode-scanning:17.0.2'
-        implementation 'com.facebook.android:facebook-core:12.0.1'`
+        implementation 'com.facebook.android:facebook-core:12.0.1'`,
     );
     return config;
   });
@@ -100,12 +99,12 @@ const withMetadata: ConfigPlugin<Props> = (config, props: Props) => {
     addMetaDataItemToMainApplication(
       mainApplication,
       "com.facebook.sdk.ApplicationId",
-      props.facebookAppId
+      props.facebookAppId,
     );
     addMetaDataItemToMainApplication(
       mainApplication,
       "com.bugsnag.android.API_KEY",
-      props.bugsnagKey
+      props.bugsnagKey,
     );
     return config;
   });
